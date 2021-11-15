@@ -6,25 +6,20 @@ import (
 	"github.com/sapiens-cosmos/arbiter/x/bond/types"
 )
 
-func (k Keeper) deposit(amount sdk.Int, maxPrice sdk.Dec, depositor string) error {
+func (k Keeper) deposit(ctx sdk.Context, amount sdk.Int, maxPrice sdk.Dec, depositor string) error {
 	address, err := sdk.AccAddressFromBech32(depositor)
 	if err != nil {
 		return err
 	}
-	k.decayDebt(ctx)
+	k.DecayDebt(ctx)
 }
 
 //
-func (k Keeper) decayDebt(ctx sdk.Context) {
+func (k Keeper) DecayDebt(ctx sdk.Context) {
 	bondState := k.GetBondState(ctx)
-	terms := k.GetTerms(ctx)
 	totalDebt := bondState.TotalDebt
 
-	blockSinceDecay := ctx.BlockHeight() - bondState.LastDecay
-	decay := totalDebt.MulInt64(blockSinceDecay).QuoInt64(terms.VestingTerm)
-	if decay.GT(totalDebt) {
-		decay = totalDebt
-	}
+	decay := k.DebtToDecay(ctx)
 
 	totalDebt = totalDebt.Sub(decay)
 
@@ -32,6 +27,32 @@ func (k Keeper) decayDebt(ctx sdk.Context) {
 	bondState.LastDecay = ctx.BlockHeight()
 
 	k.SetBondState(ctx, bondState)
+}
+
+func (k Keeper) DebtToDecay(ctx sdk.Context) sdk.Dec {
+	bondState := k.GetBondState(ctx)
+	terms := k.GetTerms(ctx)
+
+	totalDebt := bondState.TotalDebt
+	blockSinceDecay := ctx.BlockHeight() - bondState.LastDecay
+	decay := totalDebt.MulInt64(blockSinceDecay).QuoInt64(terms.VestingTerm)
+	if decay.GT(totalDebt) {
+		decay = totalDebt
+	}
+	return decay
+}
+
+func (k Keeper) debtRatio(ctx sdk.Context) {
+	bondState := k.GetBondState(ctx)
+	totalSupply := k.bankKeeper.GetSupply().GetTotal().AmountOf()
+
+	debtRatio := k.CurrentDebt().Quo()
+}
+
+func (k Keeper) CurrentDebt(ctx sdk.Context) sdk.Dec {
+	totalDebt := k.GetBondState(ctx).TotalDebt
+	debtToDecay := k.DebtToDecay(ctx)
+	return totalDebt.Sub(debtToDecay)
 }
 
 func (k Keeper) GetBondState(ctx sdk.Context) types.BondState {
