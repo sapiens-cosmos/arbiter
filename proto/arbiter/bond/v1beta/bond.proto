@@ -13,17 +13,17 @@ message BondState {
   ];
   int64 lastDecay = 2 [(gogoproto.moretags) = "yaml:\"last_decay\""];
   repeated Bond bonds = 3 [(gogoproto.moretags) = "yaml:\"bonds\""];
-}
-
-// tokens used to create bond
-message Principle {
-  string denom = 1 [(gogoproto.moretags) = "yaml:\"denom\""];
-  bool is_liquidity_bond = 2 [(gogoproto.moretags) = "yaml:\"is_liquidity_bond\""];
+  bool isLiquidityBond = 4 [(gogoproto.moretags) = "yaml:\"is_liquidity_bond\""];
+  string principle = 5 [(gogoproto.moretags) = "yaml:\"principle\""];
 }
 
 message Terms {
   // scaling variable for price
-  int64 controlVariable = 1 [(gogoproto.moretags) = "yaml:\"control_variable\""];
+  string controlVariable = 1 [
+   (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+   (gogoproto.nullable) = false,
+   (gogoproto.moretags) = "yaml:\"control_variable\""
+   ];
   // vestingTerm represented in blocks
   int64 vestingTerm = 2 [(gogoproto.moretags) = "yaml:\"vesting_term\""];
   int64 minimumPrice = 3 [(gogoproto.moretags) = "yaml:\"minimum_price\""];

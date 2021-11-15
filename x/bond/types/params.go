@@ -18,7 +18,7 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams creates a new Params instance
-func NewParams(principles []Principle) Params {
+func NewParams(principles []string) Params {
 	return Params{
 		Principles: principles,
 	}
@@ -35,7 +35,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
 	return NewParams(
-		[]Principle{},
+		[]string{},
 	)
 }
 

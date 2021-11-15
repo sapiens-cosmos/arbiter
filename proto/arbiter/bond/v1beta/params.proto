@@ -10,8 +10,7 @@ option go_package = "github.com/sapiens-cosmos/arbiter/x/bond/types";
 message Params {
   option (gogoproto.goproto_stringer)       = false;
   // tokens used to create bond
-  repeated Principle principles = 1 [
-    (gogoproto.nullable) = false,
+  repeated string principles = 1 [
     (gogoproto.moretags) = "yaml:\"principles\""
   ];
   repeated Terms terms = 2 [

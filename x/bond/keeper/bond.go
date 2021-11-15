@@ -7,11 +7,18 @@ import (
 )
 
 func (k Keeper) deposit(ctx sdk.Context, amount sdk.Int, maxPrice sdk.Dec, depositor string) error {
+	bondState := k.GetBondState(ctx)
 	address, err := sdk.AccAddressFromBech32(depositor)
 	if err != nil {
 		return err
 	}
 	k.DecayDebt(ctx)
+
+	priceInUSD := k.BondPriceInUSD(ctx)
+	nativePrice := k.BondPrice(ctx)
+
+	value := k.Valuation(bondState.Principle, amount)
+	payOut := value.Quo(k.BondPrice(ctx))
 }
 
 //
@@ -42,11 +49,32 @@ func (k Keeper) DebtToDecay(ctx sdk.Context) sdk.Dec {
 	return decay
 }
 
-func (k Keeper) debtRatio(ctx sdk.Context) {
-	bondState := k.GetBondState(ctx)
-	totalSupply := k.bankKeeper.GetSupply().GetTotal().AmountOf()
+// calculate surrent ratio of debt to bondDenom supply
+func (k Keeper) DebtRatio(ctx sdk.Context) sdk.Dec {
+	bondDenom := k.GetBondDenom(ctx)
 
-	debtRatio := k.CurrentDebt().Quo()
+	totalSupply := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(bondDenom)
+
+	debtRatio := k.CurrentDebt(ctx).QuoInt(totalSupply)
+	return debtRatio
+}
+
+func (k Keeper) BondPrice(ctx sdk.Context) sdk.Dec {
+	terms := k.GetTerms(ctx)
+
+	price := k.DebtRatio(ctx).Mul(terms.ControlVariable)
+	return price
+}
+
+// BondPriceInUSD converts bond price to USD
+func (k Keeper) BondPriceInUSD(ctx sdk.Context) sdk.Dec {
+	bondState := k.GetBondState(ctx)
+
+	if bondState.IsLiquidityBond {
+		return k.DebtRatio(ctx).Mul(k.LiquidityPairToBondDenom()).QuoInt64(100)
+	} else {
+		return k.DebtRatio(ctx).QuoInt64(100)
+	}
 }
 
 func (k Keeper) CurrentDebt(ctx sdk.Context) sdk.Dec {
@@ -103,4 +131,21 @@ func (k Keeper) SetTerms(ctx sdk.Context, terms types.Terms) {
 	}
 
 	store.Set(termsKey, value)
+}
+
+func (k Keeper) GetBondDenom(ctx sdk.Context) string {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(types.KeyBondDenom)
+	if len(bz) == 0 {
+		panic("bond denom not set")
+	}
+
+	return string(bz)
+}
+
+func (k Keeper) setBondDenom(ctx sdk.Context, bondDenom string) {
+	store := ctx.KVStore(k.storeKey)
+
+	store.Set(types.KeyBondDenom, []byte(bondDenom))
 }
