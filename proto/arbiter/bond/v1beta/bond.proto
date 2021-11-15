@@ -1,0 +1,34 @@
+syntax = "proto3";
+package arbiter.bond.v1beta1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sapiens-cosmos/arbiter/x/bond/types";
+
+message Principle {
+  string denom = 1 [(gogoproto.moretags) = "yaml:\"denom\""];
+  bool is_liquidity_bond = 2 [(gogoproto.moretags) = "yaml:\"is_liquidity_bond\""];
+}
+
+message Bond {
+  // # of tokens remaining to be paid
+  uint64 payout = 1 [(gogoproto.moretags) = "yaml:\"payout\""];
+  // blocks left for vesting
+  uint64 vesting = 2 [(gogoproto.moretags) = "yaml:\"vesting\""];
+  // last interaction
+  uint64 lastBlock = 3 [(gogoproto.moretags) = "yaml:\"last_block\""];
+  //  IN USD, for front end viewing
+  uint64 pricePaid = 4 [(gogoproto.moretags) = "yaml:\"price_paid\""];
+}
+
+message Terms {
+  // scaling variable for price
+  uint64 controlVariable = 1 [(gogoproto.moretags) = "yaml:\"control_variable\""];
+  // vestingTerm represented in blocks
+  uint64 vestingTerm = 2 [(gogoproto.moretags) = "yaml:\"vesting_term\""];
+  uint64 minimumPrice = 3 [(gogoproto.moretags) = "yaml:\"minimum_price\""];
+  uint64 maxPayout = 4 [(gogoproto.moretags) = "yaml:\"max_payout\""];
+  uint64 fee = 5 [(gogoproto.moretags) = "yaml:\"fee\""];
+  uint64 maxDebt = 6 [(gogoproto.moretags) = "yaml:\"max_debt\""];
+}
+

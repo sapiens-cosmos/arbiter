@@ -1,0 +1,17 @@
+syntax = "proto3";
+package arbiter.bond.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "arbiter/bond/v1beta/params.proto";
+
+option go_package = "github.com/sapiens-cosmos/arbiter/x/bond/types";
+
+// GenesisState defines the bond module's genesis state.
+message GenesisState {
+  // params defines all the paramaters of related to bond.
+  Params params = 1 [(gogoproto.nullable) = false];
+
+  // token given as payment for bond
+  string bond_denom = 2 [(gogoproto.moretags) = "yaml:\"bond_denom\""];
+}
+
