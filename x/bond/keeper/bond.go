@@ -18,7 +18,10 @@ func (k Keeper) deposit(ctx sdk.Context, amount sdk.Int, maxPrice sdk.Dec, depos
 	nativePrice := k.BondPrice(ctx)
 
 	value := k.Valuation(bondState.Principle, amount)
-	payOut := value.Quo(k.BondPrice(ctx))
+	payout := value.Quo(k.BondPrice(ctx))
+
+	profit := value.Sub(payout)
+
 }
 
 //
