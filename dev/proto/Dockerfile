@@ -17,10 +17,6 @@ ENV GOLANG_PROTOBUF_VERSION=1.3.5 \
   GRPC_GATEWAY_VERSION=1.14.7
 
 RUN go get \
-  github.com/golang/protobuf/protoc-gen-go@v${GOLANG_PROTOBUF_VERSION} \
-  github.com/gogo/protobuf/protoc-gen-gogo@v${GOGO_PROTOBUF_VERSION} \
-  github.com/gogo/protobuf/protoc-gen-gogofast@v${GOGO_PROTOBUF_VERSION} \
-  github.com/gogo/protobuf/protoc-gen-gogofaster@v${GOGO_PROTOBUF_VERSION} \
   github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v${GRPC_GATEWAY_VERSION} \
   github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${GRPC_GATEWAY_VERSION}
 
@@ -44,7 +40,3 @@ COPY go.sum go.sum
 RUN go mod download
 
 VOLUME /app
-
-ENV GOBIN /usr/local/go/bin
-
-CMD sh dev/proto/protogen.sh
