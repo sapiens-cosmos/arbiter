@@ -21,7 +21,7 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	appparams "github.com/hackatom/hackatom/app/params"
+	appparams "github.com/sapiens-cosmos/arbiter/app/params"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -189,7 +189,7 @@ func init() {
 		stdlog.Println("Failed to get home dir %2", err)
 	}
 
-	DefaultNodeHome = filepath.Join(userHomeDir, ".app")
+	DefaultNodeHome = filepath.Join(userHomeDir, ".arbiter")
 }
 
 // NewApp returns a reference to an initialized app.

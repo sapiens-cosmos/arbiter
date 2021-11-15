@@ -31,8 +31,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
-	"github.com/hackatom/hackatom/app"
-	"github.com/hackatom/hackatom/app/params"
+	"github.com/sapiens-cosmos/arbiter/app"
+	"github.com/sapiens-cosmos/arbiter/app/params"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the
@@ -50,7 +50,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithViper("")
 
 	rootCmd := &cobra.Command{
-		Use:   "appd",
+		Use:   "arbiterd",
 		Short: "Start node daemon",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			initClientCtx = client.ReadHomeFlag(initClientCtx, cmd)

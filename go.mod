@@ -1,4 +1,4 @@
-module github.com/hackatom/hackatom
+module github.com/sapiens-cosmos/arbiter
 
 go 1.16
 

@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/hackatom/hackatom/app/params"
+	"github.com/sapiens-cosmos/arbiter/app/params"
 
 	"github.com/cosmos/cosmos-sdk/std"
 )
