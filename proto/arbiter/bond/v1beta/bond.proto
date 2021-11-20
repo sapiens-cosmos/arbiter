@@ -5,42 +5,44 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/sapiens-cosmos/arbiter/x/bond/types";
 
+enum BondType {
+  RESERVE = 0;
+  LIQUIDITY = 1;
+}
+
 message BondState {
-  string totalDebt = 1 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+  string total_debt = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"total_debt\""
   ];
-  int64 lastDecay = 2 [(gogoproto.moretags) = "yaml:\"last_decay\""];
-  repeated Bond bonds = 3 [(gogoproto.moretags) = "yaml:\"bonds\""];
-  bool isLiquidityBond = 4 [(gogoproto.moretags) = "yaml:\"is_liquidity_bond\""];
-  string principle = 5 [(gogoproto.moretags) = "yaml:\"principle\""];
+  int64 last_decay_height = 2 [(gogoproto.moretags) = "yaml:\"last_decay_height\""];
 }
 
-message Terms {
-  // scaling variable for price
-  string controlVariable = 1 [
+message BondPolicy {
+  BondType bond_type = 1 [(gogoproto.moretags) = "yaml:\"bond_type\""];
+  string bond_denom = 2 [(gogoproto.moretags) = "yaml:\"bond_denom\""];
+  // BCV
+  string control_variable = 3 [
    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
    (gogoproto.nullable) = false,
    (gogoproto.moretags) = "yaml:\"control_variable\""
-   ];
-  // vestingTerm represented in blocks
-  int64 vestingTerm = 2 [(gogoproto.moretags) = "yaml:\"vesting_term\""];
-  int64 minimumPrice = 3 [(gogoproto.moretags) = "yaml:\"minimum_price\""];
-  int64 maxPayout = 4 [(gogoproto.moretags) = "yaml:\"max_payout\""];
-  int64 fee = 5 [(gogoproto.moretags) = "yaml:\"fee\""];
-  int64 maxDebt = 6 [(gogoproto.moretags) = "yaml:\"max_debt\""];
+  ];
+  // vestingHeight represented in blocks
+  int64 vesting_height = 4 [(gogoproto.moretags) = "yaml:\"vesting_height\""];
 }
 
 message Bond {
   // # of tokens remaining to be paid
-  uint64 payout = 1 [(gogoproto.moretags) = "yaml:\"payout\""];
+  uint64 debt = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"debt\""
+  ];
   // blocks left for vesting
-  uint64 vesting = 2 [(gogoproto.moretags) = "yaml:\"vesting\""];
+  int64 remaining_height = 2 [(gogoproto.moretags) = "yaml:\"remaining_height\""];
   // last interaction
-  uint64 lastBlock = 3 [(gogoproto.moretags) = "yaml:\"last_block\""];
-  //  IN USD, for front end viewing
-  uint64 pricePaid = 4 [(gogoproto.moretags) = "yaml:\"price_paid\""];
+  int64 last_height = 3 [(gogoproto.moretags) = "yaml:\"last_height\""];
 }
 
 
