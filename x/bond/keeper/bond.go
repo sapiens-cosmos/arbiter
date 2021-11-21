@@ -2,144 +2,100 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/gogo/protobuf/proto"
+
 	"github.com/sapiens-cosmos/arbiter/x/bond/types"
 )
 
-func (k Keeper) deposit(ctx sdk.Context, amount sdk.Int, maxPrice sdk.Dec, depositor string) error {
-	bondState := k.GetBondState(ctx)
-	address, err := sdk.AccAddressFromBech32(depositor)
+// BondIn bonds the amount of coin to receive the base coin.
+func (k Keeper) BondIn(ctx sdk.Context, bonder sdk.AccAddress, coin sdk.Coin) error {
+	policy, err := k.GetBondPolicy(ctx, coin.Denom)
 	if err != nil {
 		return err
 	}
-	k.DecayDebt(ctx)
 
-	priceInUSD := k.BondPriceInUSD(ctx)
-	nativePrice := k.BondPrice(ctx)
-
-	value := k.Valuation(bondState.Principle, amount)
-	payout := value.Quo(k.BondPrice(ctx))
-
-	profit := value.Sub(payout)
-
-}
-
-//
-func (k Keeper) DecayDebt(ctx sdk.Context) {
-	bondState := k.GetBondState(ctx)
-	totalDebt := bondState.TotalDebt
-
-	decay := k.DebtToDecay(ctx)
-
-	totalDebt = totalDebt.Sub(decay)
-
-	bondState.TotalDebt = totalDebt
-	bondState.LastDecay = ctx.BlockHeight()
-
-	k.SetBondState(ctx, bondState)
-}
-
-func (k Keeper) DebtToDecay(ctx sdk.Context) sdk.Dec {
-	bondState := k.GetBondState(ctx)
-	terms := k.GetTerms(ctx)
-
-	totalDebt := bondState.TotalDebt
-	blockSinceDecay := ctx.BlockHeight() - bondState.LastDecay
-	decay := totalDebt.MulInt64(blockSinceDecay).QuoInt64(terms.VestingTerm)
-	if decay.GT(totalDebt) {
-		decay = totalDebt
-	}
-	return decay
-}
-
-// calculate surrent ratio of debt to bondDenom supply
-func (k Keeper) DebtRatio(ctx sdk.Context) sdk.Dec {
-	bondDenom := k.GetBondDenom(ctx)
-
-	totalSupply := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(bondDenom)
-
-	debtRatio := k.CurrentDebt(ctx).QuoInt(totalSupply)
-	return debtRatio
-}
-
-func (k Keeper) BondPrice(ctx sdk.Context) sdk.Dec {
-	terms := k.GetTerms(ctx)
-
-	price := k.DebtRatio(ctx).Mul(terms.ControlVariable)
-	return price
-}
-
-// BondPriceInUSD converts bond price to USD
-func (k Keeper) BondPriceInUSD(ctx sdk.Context) sdk.Dec {
-	bondState := k.GetBondState(ctx)
-
-	if bondState.IsLiquidityBond {
-		return k.DebtRatio(ctx).Mul(k.LiquidityPairToBondDenom()).QuoInt64(100)
-	} else {
-		return k.DebtRatio(ctx).QuoInt64(100)
-	}
-}
-
-func (k Keeper) CurrentDebt(ctx sdk.Context) sdk.Dec {
-	totalDebt := k.GetBondState(ctx).TotalDebt
-	debtToDecay := k.DebtToDecay(ctx)
-	return totalDebt.Sub(debtToDecay)
-}
-
-func (k Keeper) GetBondState(ctx sdk.Context) types.BondState {
-	bondState := types.BondState{}
-	store := ctx.KVStore(k.storeKey)
-	b := store.Get(types.KeyBondState)
-	if b == nil {
-		return bondState
-	}
-	err := proto.Unmarshal(b, &bondState)
+	premium, err := k.GetPremium(ctx, coin.Denom)
 	if err != nil {
-		return bondState
+		return err
 	}
-}
 
-func (k Keeper) SetBondState(ctx sdk.Context, bondState types.BondState) {
-	store := ctx.KVStore(k.storeKey)
-	bondStateKey := types.KeyBondState
-
-	value, err := proto.Marshal(&bondState)
+	riskFreePrice, err := k.GetRiskFreePrice(ctx, coin.Denom)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	store.Set(bondStateKey, value)
-}
+	// Executing Price = RiskFreePrice * Premium {Premium ≥ 1}
+	executingPrice := riskFreePrice.ToDec().Mul(premium).TruncateInt()
 
-func (k Keeper) GetTerms(ctx sdk.Context) types.Terms {
-	terms := types.Terms{}
-	store := ctx.KVStore(k.storeKey)
-	b := store.Get(types.KeyTerms)
-	if b == nil {
-		return terms
-	}
-	err := proto.Unmarshal(b, &terms)
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, bonder, types.ModuleName, sdk.NewCoins(coin))
 	if err != nil {
-		return terms
+		return err
 	}
-}
 
-func (k Keeper) SetTerms(ctx sdk.Context, terms types.Terms) {
-	store := ctx.KVStore(k.storeKey)
-	termsKey := types.KeyTerms
+	newDebtAmount := coin.Amount.Quo(executingPrice)
 
-	value, err := proto.Marshal(&terms)
+	err = k.inflateTotalDebt(ctx, coin.Denom, newDebtAmount)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	store.Set(termsKey, value)
+	// Mint the base coin
+	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(k.GetBaseDenom(ctx), newDebtAmount)))
+	if err != nil {
+		return err
+	}
+
+	bond := types.Debt{
+		Amount:          newDebtAmount,
+		RemainingHeight: policy.VestingHeight,
+		LastHeight:      ctx.BlockHeight(),
+	}
+
+	err = k.setDebt(ctx, bond, bonder)
+	if err != nil {
+		return err
+	}
+
+	// profit := newDebtAmount.Mul(executingPrice.Sub(riskFreePrice))
+	panic("add logic to distribute profit to the stakers")
 }
 
-func (k Keeper) GetBondDenom(ctx sdk.Context) string {
+// GetPremium returns the premium to calculate the executing price.
+// Premium = 1 + (Debt Ratio * ControlVariable)
+func (k Keeper) GetPremium(ctx sdk.Context, bondDenom string) (sdk.Dec, error) {
+	debtRatio, err := k.GetDebtRatio(ctx, bondDenom)
+	if err != nil {
+		return sdk.Dec{}, err
+	}
+
+	policy, err := k.GetBondPolicy(ctx, bondDenom)
+	if err != nil {
+		return sdk.Dec{}, err
+	}
+
+	return sdk.NewDec(1).Add(debtRatio.Mul(policy.ControlVariable)), nil
+}
+
+func (k Keeper) GetRiskFreePrice(ctx sdk.Context, bondDenom string) (sdk.Int, error) {
+	policy, err := k.GetBondPolicy(ctx, bondDenom)
+	if err != nil {
+		return sdk.Int{}, err
+	}
+
+	switch policy.BondType {
+	case types.BondType_RESERVE:
+		// If the bond type is reverse, just use the constant 1.
+		return sdk.NewInt(1), nil
+	case types.BondType_LIQUIDITY:
+		panic("TODO: risk free price for the liquidity not yet implemented")
+	default:
+		panic("unknown bond type")
+	}
+}
+
+func (k Keeper) GetBaseDenom(ctx sdk.Context) string {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := store.Get(types.KeyBondDenom)
+	bz := store.Get(types.KeyBaseDenom)
 	if len(bz) == 0 {
 		panic("bond denom not set")
 	}
@@ -147,8 +103,8 @@ func (k Keeper) GetBondDenom(ctx sdk.Context) string {
 	return string(bz)
 }
 
-func (k Keeper) setBondDenom(ctx sdk.Context, bondDenom string) {
+func (k Keeper) setBaseDenom(ctx sdk.Context, bondDenom string) {
 	store := ctx.KVStore(k.storeKey)
 
-	store.Set(types.KeyBondDenom, []byte(bondDenom))
+	store.Set(types.KeyBaseDenom, []byte(bondDenom))
 }

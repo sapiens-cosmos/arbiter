@@ -9,5 +9,5 @@ import (
 func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 	// TODO: Set params.
 
-	k.setBondDenom(ctx, genState.BondDenom)
+	k.setBaseDenom(ctx, genState.BaseDenom)
 }

@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	KeyPrinciples = []byte("Principles")
+	KeyPolicies = []byte("Policies")
 )
 
 var _ paramtypes.ParamSet = (*Params)(nil)
@@ -18,9 +18,9 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams creates a new Params instance
-func NewParams(principles []string) Params {
+func NewParams(policies []BondPolicy) Params {
 	return Params{
-		Principles: principles,
+		Policies: policies,
 	}
 }
 
@@ -28,14 +28,14 @@ func NewParams(principles []string) Params {
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		// TODO: Add validate fn.
-		paramtypes.NewParamSetPair(KeyPrinciples, &p.Principles, nil),
+		paramtypes.NewParamSetPair(KeyPolicies, &p.Policies, nil),
 	}
 }
 
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
 	return NewParams(
-		[]string{},
+		[]BondPolicy{},
 	)
 }
 

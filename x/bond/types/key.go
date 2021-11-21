@@ -1,10 +1,31 @@
 package types
 
+import sdk "github.com/cosmos/cosmos-sdk/types"
+
+const (
+	// ModuleName is the name of the bond module
+	ModuleName = "bond"
+
+	// StoreKey is the string store representation
+	StoreKey = ModuleName
+
+	// RouterKey is the msg router key for the staking module
+	RouterKey = ModuleName
+)
+
 var (
-	// KeyBondDenom defines state to store bond denom
-	KeyBondDenom = []byte{0x01}
+	// KeyBaseDenom defines state to store base denom
+	KeyBaseDenom = []byte{0x01}
 	// KeyBondState defines state to store bond state
 	KeyBondState = []byte{0x02}
-	// KeyTerms defines state to store term
-	KeyTerms = []byte{0x03}
+	// KeyDebt defines state to store debt
+	KeyDebt = []byte{0x03}
 )
+
+func GetBondStateKey(bondDenom string) []byte {
+	return append(KeyBondState, []byte(bondDenom)...)
+}
+
+func GetDebtKey(bonder sdk.AccAddress) []byte {
+	return append(KeyDebt, bonder...)
+}
