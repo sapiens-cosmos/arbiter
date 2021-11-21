@@ -1,0 +1,28 @@
+syntax = "proto3";
+package arbiter.bond.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/sapiens-cosmos/arbiter/x/bond/types";
+
+// Msg defines the bond Msg service.
+service Msg {
+  // BondIn defines a method for bonding some amount of coin to receive the base coin.
+  rpc BondIn(MsgBondIn) returns (MsgBondInResponse);
+}
+
+// MsgBondIn represents a message to bond some amount of coin to receive the base coin.
+message MsgBondIn {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string   bonder                    = 1 [(gogoproto.moretags) = "yaml:\"bonder\""];
+  cosmos.base.v1beta1.Coin coin = 2 [
+    (gogoproto.moretags) = "yaml:\"coin\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// MsgBondInResponse defines the Msg/BondIn response type.
+message MsgBondInResponse {}
