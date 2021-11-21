@@ -7,7 +7,7 @@ import (
 )
 
 func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
-	// TODO: Set params.
+	k.setParams(ctx, genState.Params)
 
 	k.setBaseDenom(ctx, genState.BaseDenom)
 }
