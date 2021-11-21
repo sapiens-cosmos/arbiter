@@ -19,6 +19,7 @@ import (
 
 	"github.com/sapiens-cosmos/arbiter/x/bond/keeper"
 	"github.com/sapiens-cosmos/arbiter/x/bond/types"
+	"github.com/sapiens-cosmos/arbiter/x/bond/client/cli"
 )
 
 var (
@@ -68,8 +69,7 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 
 // GetTxCmd returns the root tx command for the bond module.
 func (AppModuleBasic) GetTxCmd() *cobra.Command {
-	// TODO
-	return nil
+	return cli.GetTxCmd()
 }
 
 // GetQueryCmd returns no root query command for the bond module.
