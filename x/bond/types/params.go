@@ -3,6 +3,8 @@ package types
 import (
 	"gopkg.in/yaml.v2"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
@@ -35,7 +37,14 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
 	return NewParams(
-		[]BondPolicy{},
+		[]BondPolicy{
+			{
+				BondType:        BondType_RESERVE,
+				BondDenom:       "bond",
+				ControlVariable: sdk.NewDec(1),
+				VestingHeight:   10,
+			},
+		},
 	)
 }
 
