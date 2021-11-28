@@ -1,0 +1,19 @@
+syntax = "proto3";
+package arbiter.stake.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "arbiter/stake/v1beta/stake.proto";
+
+option go_package = "github.com/sapiens-cosmos/arbiter/x/stake/types";
+
+// Params defines the parameters for the stake module.
+message Params {
+  option (gogoproto.goproto_stringer)       = false;
+
+  string reward_rate  = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"reward_rate\""
+  ];
+}
+

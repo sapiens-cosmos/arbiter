@@ -1,0 +1,15 @@
+syntax = "proto3";
+package arbiter.stake.v1beta1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sapiens-cosmos/arbiter/x/stake/types";
+
+message Epoch {
+    int64 end_block = 1;
+    int64 number = 2;
+}
+
+message GenesisState {
+    Epoch epoch = 1 [ (gogoproto.nullable) = false ];
+}
