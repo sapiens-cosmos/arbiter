@@ -39,4 +39,6 @@ COPY go.sum go.sum
 
 RUN go mod download
 
+RUN go install github.com/regen-network/cosmos-proto/protoc-gen-gocosmos
+
 VOLUME /app

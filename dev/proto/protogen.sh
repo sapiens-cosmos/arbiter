@@ -1,7 +1,9 @@
 #! /bin/bash -x
 set -e
 
-go install github.com/regen-network/cosmos-proto/protoc-gen-gocosmos
+if [ "$1" != "--skip-install" ]; then
+  go install github.com/regen-network/cosmos-proto/protoc-gen-gocosmos
+fi
 
 # Get the path of the cosmos-sdk repo from go/pkg/mod
 cosmos_sdk_dir=$(go list -f '{{ .Dir }}' -m github.com/cosmos/cosmos-sdk)
