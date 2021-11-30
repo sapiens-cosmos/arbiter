@@ -41,6 +41,33 @@ func (k Keeper) RedeemDebt(ctx sdk.Context, bonder sdk.AccAddress) error {
 	}
 }
 
+func (k Keeper) AddDebt(ctx sdk.Context, bonder sdk.AccAddress, bondDenom string, amount sdk.Int) error {
+	policy, err := k.GetBondPolicy(ctx, bondDenom)
+	if err != nil {
+		return err
+	}
+
+	debt, err := k.GetDebt(ctx, bonder)
+	if err != nil {
+		sdkErr, ok := err.(sdkerrors.Error)
+		if ok && sdkErr.Is(types.ErrNoDebt) {
+			debt = types.Debt{
+				Amount: sdk.NewInt(0),
+			}
+		} else {
+			return err
+		}
+	}
+
+	debt = types.Debt{
+		Amount:          debt.Amount.Add(amount),
+		RemainingHeight: policy.VestingHeight,
+		LastHeight:      ctx.BlockHeight(),
+	}
+
+	return k.setDebt(ctx, debt, bonder)
+}
+
 func (k Keeper) GetDebt(ctx sdk.Context, bonder sdk.AccAddress) (types.Debt, error) {
 	store := ctx.KVStore(k.storeKey)
 

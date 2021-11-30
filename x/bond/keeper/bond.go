@@ -8,11 +8,6 @@ import (
 
 // BondIn bonds the amount of coin to receive the base coin.
 func (k Keeper) BondIn(ctx sdk.Context, bonder sdk.AccAddress, coin sdk.Coin) error {
-	policy, err := k.GetBondPolicy(ctx, coin.Denom)
-	if err != nil {
-		return err
-	}
-
 	premium, err := k.GetPremium(ctx, coin.Denom)
 	if err != nil {
 		return err
@@ -31,31 +26,25 @@ func (k Keeper) BondIn(ctx sdk.Context, bonder sdk.AccAddress, coin sdk.Coin) er
 		return err
 	}
 
-	newDebtAmount := coin.Amount.Quo(executingPrice)
+	debtAmount := coin.Amount.Quo(executingPrice)
 
-	err = k.inflateTotalDebt(ctx, coin.Denom, newDebtAmount)
+	err = k.inflateTotalDebt(ctx, coin.Denom, debtAmount)
 	if err != nil {
 		return err
 	}
 
 	// Mint the base coin
-	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(k.GetBaseDenom(ctx), newDebtAmount)))
+	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(k.GetBaseDenom(ctx), debtAmount)))
 	if err != nil {
 		return err
 	}
 
-	bond := types.Debt{
-		Amount:          newDebtAmount,
-		RemainingHeight: policy.VestingHeight,
-		LastHeight:      ctx.BlockHeight(),
-	}
-
-	err = k.setDebt(ctx, bond, bonder)
+	err = k.AddDebt(ctx, bonder, coin.Denom, debtAmount)
 	if err != nil {
 		return err
 	}
 
-	// profit := newDebtAmount.Mul(executingPrice.Sub(riskFreePrice))
+	// profit := debtAmount.Mul(executingPrice.Sub(riskFreePrice))
 	panic("add logic to distribute profit to the stakers")
 }
 
