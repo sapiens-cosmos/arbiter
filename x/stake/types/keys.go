@@ -15,10 +15,13 @@ const (
 )
 
 var (
-	// KeyPrefixEpoch defines prefix key for storing epochs
+	// KeyEpoch defines key for storing epochs
 	KeyEpoch = []byte{0x01}
+
+	// KeyPrefixLock defines key for storing individual locks
+	KeyPrefixLock = []byte{0x02}
 )
 
-func KeyPrefix(p string) []byte {
-	return []byte(p)
+func GetAddressLockStoreKey(address string) []byte {
+	return append(KeyPrefixLock, []byte(address)...)
 }

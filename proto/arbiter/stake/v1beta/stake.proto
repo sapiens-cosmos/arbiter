@@ -2,5 +2,15 @@ syntax = "proto3";
 package arbiter.stake.v1beta1;
 
 import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/sapiens-cosmos/arbiter/x/stake/types";
+
+message Lock {
+    int64 ID = 1;
+    string owner = 2 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
+    cosmos.base.v1beta1.Coin coin = 3 [
+        (gogoproto.nullable) = false,
+        (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}

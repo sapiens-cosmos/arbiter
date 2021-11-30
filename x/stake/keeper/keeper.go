@@ -10,10 +10,11 @@ import (
 
 // keeper of the stake store
 type Keeper struct {
-	storeKey   sdk.StoreKey
-	cdc        codec.BinaryMarshaler
-	bankKeeper types.BankKeeper
-	paramstore paramtypes.Subspace
+	storeKey      sdk.StoreKey
+	cdc           codec.BinaryMarshaler
+	accountKeeper types.AccountKeeper
+	bankKeeper    types.BankKeeper
+	paramstore    paramtypes.Subspace
 }
 
 // NewKeeper creates a new stake Keeper instance
