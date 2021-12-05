@@ -112,3 +112,23 @@ func (q queryServer) StakeInfo(ctx context.Context, req *types.QueryStakeInfoReq
 
 	return &types.QueryStakeInfoResponse{Balance: &balance, Staked: &staked, BlockUntilRebase: blockUntilRebase, RewardYield: &rewardYield}, nil
 }
+
+func (q queryServer) TotalReserve(ctx context.Context, req *types.QueryTotalReserveRequest) (*types.QueryTotalReserveResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	// balance := q.keeper.GetBalance(sdkCtx, address)
+	// staked, err := q.keeper.GetStakedTokenByAddress(sdkCtx, address)
+	// if err != nil {
+	// 	return nil, status.Error(codes.Internal, err.Error())
+	// }
+	// blockUntilRebase := q.keeper.GetBlockUntilRebase(sdkCtx)
+	// rewardYield := q.keeper.GetRewardYield(sdkCtx)
+
+	totalReserve := q.keeper.GetTotalReserve(sdkCtx).Int64()
+
+	return &types.QueryTotalReserveResponse{TotalReserve: totalReserve}, nil
+}

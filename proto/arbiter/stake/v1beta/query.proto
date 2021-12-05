@@ -24,6 +24,9 @@ service Query {
     rpc StakeInfo(QueryStakeInfoRequest) returns (QueryStakeInfoResponse) {
         option (google.api.http).get = "/arbiter/stake/v1beta1/stake_info/{sender}";
     }
+    rpc TotalReserve(QueryTotalReserveRequest) returns (QueryTotalReserveResponse) {
+        option (google.api.http).get = "/arbiter/stake/v1beta1/total_reserve";
+    }
 }
 
 //=============================== Balance
@@ -75,4 +78,10 @@ message QueryStakeInfoResponse {
     string rewardYield = 4 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
     ];
+}
+
+//=============================== TotalReserve
+message QueryTotalReserveRequest  {}
+message QueryTotalReserveResponse  {
+    int64 totalReserve = 1;
 }

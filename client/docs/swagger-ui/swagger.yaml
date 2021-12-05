@@ -379,6 +379,42 @@ paths:
                       format: byte
       tags:
         - Query
+  /arbiter/stake/v1beta1/total_reserve:
+    get:
+      operationId: TotalReserve
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              totalReserve:
+                type: string
+                format: int64
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
   /node_info:
     get:
       description: Information about the connected node
@@ -21929,6 +21965,12 @@ definitions:
     type: object
     properties:
       blockUntilRebase:
+        type: string
+        format: int64
+  arbiter.stake.v1beta1.QueryTotalReserveResponse:
+    type: object
+    properties:
+      totalReserve:
         type: string
         format: int64
   CheckTxResult:
