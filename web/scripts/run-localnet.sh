@@ -18,7 +18,7 @@ echo "Validator mnemonic: high gain deposit chuckle hundred regular exist approv
 echo "Account1 mnemonic: health nest provide snow total tissue intact loyal cargo must credit wrist"
 echo "Account2 mnemonic: canyon stone next tenant trial ugly slim luggage ski govern outside comfort"
 echo "Account2 mnemonic: travel renew first fiction trick fly disease advance hunt famous absurd region"
-echo "Each account has the balances (10000000000uarb)"
+echo "Each account has the balances (10000000000uarb,10000000000ugreen)"
 
 echo "Chain id: arbiter-localnet-1"
 echo "RPC: http://localhost:26657"
