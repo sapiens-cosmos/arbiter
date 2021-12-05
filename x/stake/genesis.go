@@ -8,7 +8,10 @@ import (
 
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	initTokens := sdk.NewCoins(genState.ModuleAccountBalance, genState.ModuleAccountSTokenBalance)
-	k.CreateModuleAccount(ctx, initTokens)
+	err := k.CreateModuleAccount(ctx, initTokens)
+	if err != nil {
+		panic(err)
+	}
 	k.SetStakeState(ctx, genState.StakeState)
 }
 
