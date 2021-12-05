@@ -4,30 +4,35 @@ import { Bech32Address } from "@keplr-wallet/cosmos";
 import { useEffect, useState } from "react";
 
 const chainInfo: ChainInfo = {
-  rpc: "https://vega-rpc.interchain.io",
-  rest: "https://vega-rest.interchain.io",
-  chainId: "vega-testnet",
-  chainName: "TESTNET",
+  rpc: "http://localhost:26657",
+  rest: "http://localhost:1317",
+  chainId: "arbiter-localnet-1",
+  chainName: "Arbiter",
   stakeCurrency: {
-    coinDenom: "ATOM",
-    coinMinimalDenom: "uatom",
+    coinDenom: "ARB",
+    coinMinimalDenom: "uarb",
     coinDecimals: 6,
   },
   bip44: {
     coinType: 118,
   },
-  bech32Config: Bech32Address.defaultBech32Config("cosmos"),
+  bech32Config: Bech32Address.defaultBech32Config("arbiter"),
   currencies: [
     {
-      coinDenom: "ATOM",
-      coinMinimalDenom: "uatom",
+      coinDenom: "ARB",
+      coinMinimalDenom: "uarb",
+      coinDecimals: 6,
+    },
+    {
+      coinDenom: "GREEN",
+      coinMinimalDenom: "ugreen",
       coinDecimals: 6,
     },
   ],
   feeCurrencies: [
     {
-      coinDenom: "ATOM",
-      coinMinimalDenom: "uatom",
+      coinDenom: "ARB",
+      coinMinimalDenom: "uarb",
       coinDecimals: 6,
     },
   ],

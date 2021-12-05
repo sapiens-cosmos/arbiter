@@ -7,18 +7,14 @@ export default function Stake() {
     <div className="w-full h-full rounded-xl bg-primary pt-8 pb-12 px-16 flex flex-col items-center">
       <div className="text-3xl mb-8">Stake (3, 3)</div>
 
-      <div className="w-full mb-12 flex justify-between">
+      <div className="w-full mb-12 flex justify-around">
         <div className="flex flex-col items-center">
-          <div className="text-xl">APY</div>
-          <div className="text-2xl">87,929.4%</div>
+          <div className="text-lg">APY</div>
+          <div className="text-xl">87,929.4%</div>
         </div>
         <div className="flex flex-col items-center">
-          <div className="text-xl">Total Value Staked</div>
-          <div className="text-2xl">$23,311,222</div>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="text-xl">Current Index</div>
-          <div className="text-2xl">23.2 ARB</div>
+          <div className="text-lg">Total Value Staked</div>
+          <div className="text-xl">$23,311,222</div>
         </div>
       </div>
 
