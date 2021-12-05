@@ -52,6 +52,7 @@ func (k Keeper) Rebase(ctx sdk.Context) error {
 
 		k.SetEpoch(ctx, epoch)
 	}
+	return nil
 }
 
 // Distribute sends epoch rewards to staking contract
