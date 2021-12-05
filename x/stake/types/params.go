@@ -28,7 +28,9 @@ func NewParams(rewardRate sdk.Dec) Params {
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		// TODO: Add validate fn.
-		paramtypes.NewParamSetPair(KeyRewardRate, &p.RewardRate, nil),
+		paramtypes.NewParamSetPair(KeyRewardRate, &p.RewardRate, func(value interface{}) error {
+			return nil
+		}),
 	}
 }
 
