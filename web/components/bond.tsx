@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { GrClose } from "react-icons/gr";
 
 function BondModal({ closeModal }: { closeModal: () => void }) {
   const [mode, setMode] = useState<"Bond" | "Redeem">("Bond");
@@ -14,7 +15,16 @@ function BondModal({ closeModal }: { closeModal: () => void }) {
         closeModal();
       }}
     >
-      <div className="rounded-xl w-full max-w-modal pt-8 pb-12 px-16 bg-secondary">
+      <div className="rounded-xl w-full max-w-modal pt-8 pb-12 px-16 bg-secondary relative">
+        <div
+          className="absolute top-6 right-6 cursor-pointer"
+          onClick={closeModal}
+        >
+          <GrClose />
+        </div>
+
+        <div className="w-full mb-6 flex justify-around text-3xl">GREEN</div>
+
         <div className="w-full mb-4 flex justify-around">
           <div className="flex flex-col items-center">
             <div className="text-lg">Bond Price(1 ARB)</div>
