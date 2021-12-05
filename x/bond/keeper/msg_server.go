@@ -35,3 +35,19 @@ func (k msgServer) BondIn(goCtx context.Context, msg *types.MsgBondIn) (*types.M
 
 	return &types.MsgBondInResponse{}, nil
 }
+
+func (k msgServer) Redeem(goCtx context.Context, msg *types.MsgRedeem) (*types.MsgRedeemResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	bonder, err := sdk.AccAddressFromBech32(msg.Bonder)
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.keeper.RedeemDebt(ctx, bonder)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgRedeemResponse{}, nil
+}
