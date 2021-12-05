@@ -1,44 +1,46 @@
 package types
 
-import (
-	"gopkg.in/yaml.v2"
+import "gopkg.in/yaml.v2"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-)
+// import (
+// 	"gopkg.in/yaml.v2"
 
-var (
-	KeyRewardRate = []byte("RewardRate")
-)
+// 	sdk "github.com/cosmos/cosmos-sdk/types"
+// 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+// )
 
-var _ paramtypes.ParamSet = (*Params)(nil)
+// var (
+// 	KeyRewardRate = []byte("RewardRate")
+// )
 
-// ParamTable for staking module
-func ParamKeyTable() paramtypes.KeyTable {
-	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
-}
+// var _ paramtypes.ParamSet = (*Params)(nil)
 
-// NewParams creates a new Params instance
-func NewParams(rewardRate sdk.Dec) Params {
-	return Params{
-		RewardRate: rewardRate,
-	}
-}
+// // ParamTable for staking module
+// func ParamKeyTable() paramtypes.KeyTable {
+// 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
+// }
 
-// Implements params.ParamSet
-func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
-	return paramtypes.ParamSetPairs{
-		// TODO: Add validate fn.
-		paramtypes.NewParamSetPair(KeyRewardRate, &p.RewardRate, nil),
-	}
-}
+// // NewParams creates a new Params instance
+// func NewParams(rewardRate sdk.Dec) Params {
+// 	return Params{
+// 		RewardRate: rewardRate,
+// 	}
+// }
 
-// DefaultParams returns a default set of parameters.
-func DefaultParams() Params {
-	return Params{
-		RewardRate: sdk.MustNewDecFromStr("0.3058"),
-	}
-}
+// // Implements params.ParamSet
+// func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
+// 	return paramtypes.ParamSetPairs{
+// 		// TODO: Add validate fn.
+// 		paramtypes.NewParamSetPair(KeyRewardRate, &p.RewardRate, nil),
+// 	}
+// }
+
+// // DefaultParams returns a default set of parameters.
+// func DefaultParams() Params {
+// 	return Params{
+// 		RewardRate: sdk.MustNewDecFromStr("0.3058"),
+// 	}
+// }
 
 // String returns a human readable string representation of the parameters.
 func (p Params) String() string {

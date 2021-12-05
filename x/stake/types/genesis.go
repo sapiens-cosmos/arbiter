@@ -10,15 +10,18 @@ import (
 // default epoch length is set to 62,000 blocks, which is around 5 human days
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Epoch: Epoch{
-			EndBlock:   0,
-			Number:     0,
-			Length:     62_000,
-			Distribute: 0,
+		StakeState: StakeState{
+			Epoch: Epoch{
+				EndBlock:   0,
+				Number:     0,
+				Length:     62_000,
+				Distribute: 0,
+			},
+			TotalReserve: sdk.ZeroInt(),
 		},
 		ModuleAccountBalance: sdk.NewCoin(appParams.BaseCoinUnit, sdk.ZeroInt()),
-		// sToken Balance starts with 100 shares to avoid zero exception
-		ModuleAccountSTokenBalance: sdk.NewCoin(appParams.BaseStakeCoinUnit, sdk.NewInt(100)),
+		// sToken Balance starts with 1sToken to avoid zero exception
+		ModuleAccountSTokenBalance: sdk.NewCoin(appParams.BaseStakeCoinUnit, sdk.NewInt(1_000_000)),
 	}
 }
 

@@ -3,18 +3,13 @@ package arbiter.stake.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "arbiter/stake/v1beta/stake.proto";
 
 option go_package = "github.com/sapiens-cosmos/arbiter/x/stake/types";
 
-message Epoch {
-    int64 end_block = 1;
-    int64 number = 2;
-    int64 length = 3;
-    int64 distribute = 4;
-}
 
 message GenesisState {
-    Epoch epoch = 1 [ (gogoproto.nullable) = false ];
+    StakeState stake_state = 1 [ (gogoproto.nullable) = false ];
     // balance of the stake module's account
     cosmos.base.v1beta1.Coin module_account_balance = 2 [
         (gogoproto.moretags) = "yaml:\"module_account_balance\"",

@@ -7,10 +7,25 @@ import "cosmos/base/v1beta1/coin.proto";
 option go_package = "github.com/sapiens-cosmos/arbiter/x/stake/types";
 
 message Lock {
-    int64 ID = 1;
-    string owner = 2 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
-    cosmos.base.v1beta1.Coin coin = 3 [
-        (gogoproto.nullable) = false,
-        (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  string owner = 1 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
+  cosmos.base.v1beta1.Coin coin = 2 [
+      (gogoproto.nullable) = false,
+      (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+}
+
+message Epoch {
+    int64 end_block = 1;
+    int64 number = 2;
+    int64 length = 3;
+    int64 distribute = 4;
+}
+
+message StakeState {
+  string total_reserve = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.moretags) = "yaml:\"weight\"",
+    (gogoproto.nullable) = false
+  ];
+  Epoch epoch = 2 [ (gogoproto.nullable) = false ];
 }

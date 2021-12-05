@@ -20,6 +20,9 @@ var (
 
 	// KeyPrefixLock defines key for storing individual locks
 	KeyPrefixLock = []byte{0x02}
+
+	// KeyPrefixLock defines key for storing total reserve of the protocol
+	KeyStakeState = []byte{0x03}
 )
 
 func GetAddressLockStoreKey(address string) []byte {
