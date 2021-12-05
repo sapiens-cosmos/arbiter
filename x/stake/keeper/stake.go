@@ -39,9 +39,8 @@ func (k Keeper) JoinStake(ctx sdk.Context, address string, tokenIn sdk.Coin) err
 			}
 			k.SetLockByAddress(ctx, lock)
 			return nil
-		} else {
-			return err
 		}
+		return err
 	}
 
 	lock.Coin.Add(sTokens)
@@ -65,10 +64,10 @@ func (k Keeper) Rebase(ctx sdk.Context) error {
 		moduleAccountBalance := k.GetModuleAccountBalance(ctx)
 		staked := k.CirculatingSupply(ctx)
 
-		if moduleAccountBalance.Amount.LTE(staked.Amount) {
+		if moduleAccountBalance.Amount.LTE(staked) {
 			epoch.Distribute = 0
 		} else {
-			epoch.Distribute = moduleAccountBalance.Sub(staked).Amount.Int64()
+			epoch.Distribute = moduleAccountBalance.Amount.Sub(staked).Int64()
 		}
 
 		k.SetEpoch(ctx, epoch)

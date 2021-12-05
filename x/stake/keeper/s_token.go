@@ -26,7 +26,7 @@ func (k Keeper) GetModuleAccountSTokenBalance(ctx sdk.Context) sdk.Coin {
 }
 
 // CreateModuleAccount creates module account with baseToken and sToken minted
-func (k Keeper) CreateModuleAccount(ctx sdk.Context, coins sdk.Coins) error{
+func (k Keeper) CreateModuleAccount(ctx sdk.Context, coins sdk.Coins) error {
 	moduleAcc := authtypes.NewEmptyModuleAccount(types.ModuleName, authtypes.Minter)
 	k.accountKeeper.SetModuleAccount(ctx, moduleAcc)
 	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, coins)
@@ -40,26 +40,27 @@ func (k Keeper) CreateModuleAccount(ctx sdk.Context, coins sdk.Coins) error{
 // individual epoch distribution is equal to profit
 func (k Keeper) RebaseToken(ctx sdk.Context, profit int64, epoch int64) sdk.Int {
 	rebaseAmount := sdk.NewInt(0)
-	totalSupply := k.bankKeeper.GetSupply(ctx, appParams.BaseCoinUnit)
+	totalSupply := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(appParams.BaseCoinUnit)
+
 	circulatingSupply := k.CirculatingSupply(ctx)
 
 	// no rebase is done when profit is 0
 	if profit == 0 {
-		return totalSupply.Amount
-	} else if circulatingSupply.Amount.GT(sdk.ZeroInt()) {
-		rebaseAmount = sdk.NewInt(profit).Mul(totalSupply.Amount).Quo(circulatingSupply.Amount)
+		return totalSupply
+	} else if circulatingSupply.GT(sdk.ZeroInt()) {
+		rebaseAmount = sdk.NewInt(profit).Mul(totalSupply).Quo(circulatingSupply)
 	} else {
 		rebaseAmount = sdk.NewInt(profit)
 	}
 
-	totalSupply.Amount.Add(rebaseAmount)
-	return totalSupply.Amount
+	totalSupply.Add(rebaseAmount)
+	return totalSupply
 }
 
 // CirculatingSupply calculates the circulating supply which is represented through,
 // total supply - staked amount
-func (k Keeper) CirculatingSupply(ctx sdk.Context) sdk.Coin {
-	totalSupply := k.bankKeeper.GetSupply(ctx, appParams.BaseCoinUnit)
-	moduleAccountBalance := k.GetModuleAccountBalance(ctx)
+func (k Keeper) CirculatingSupply(ctx sdk.Context) sdk.Int {
+	totalSupply := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(appParams.BaseCoinUnit)
+	moduleAccountBalance := k.GetModuleAccountBalance(ctx).Amount
 	return totalSupply.Sub(moduleAccountBalance)
 }
