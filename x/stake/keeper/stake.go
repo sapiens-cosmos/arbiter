@@ -79,6 +79,42 @@ func (k Keeper) Distribute(ctx sdk.Context) error {
 	return nil
 }
 
+// Claim receives sTokens from user, unstake and distribute base Token
+func (k Keeper) Claim(ctx sdk.Context, address string, amount sdk.Int) error {
+	returnCoin := sdk.NewCoin(appParams.BaseStakeCoinUnit, amount)
+
+	// send sTokens from user to module account, then burn
+	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sdk.AccAddress(address), types.ModuleName, sdk.Coins{returnCoin})
+	if err != nil {
+		return err
+	}
+	err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.Coins{returnCoin})
+	if err != nil {
+		return err
+	}
+
+	// send base Token to user account
+	receiveCoin := sdk.NewCoin(appParams.BaseCoinUnit, amount)
+	k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(address), sdk.Coins{receiveCoin})
+
+	// update lock and share status
+	lock, err := k.GetLockByAddress(ctx, address)
+	if err != nil {
+		return err
+	}
+
+	remainingStake := lock.Coin.Amount.Sub(amount)
+
+	// if user claimed all stake, delete lock and if not, update lock
+	if remainingStake.LTE(sdk.ZeroInt()) {
+		k.DeleteLock(ctx, lock)
+	} else {
+		lock.Coin = lock.Coin.Sub(returnCoin)
+		k.SetLockByAddress(ctx, lock)
+	}
+	return nil
+}
+
 func (k Keeper) GetTotalReward(ctx sdk.Context) sdk.Dec {
 	totalSupply := k.bankKeeper.GetSupply(ctx, appParams.BaseCoinUnit)
 	if totalSupply.Amount.LT(sdk.NewInt(1_000_000)) {

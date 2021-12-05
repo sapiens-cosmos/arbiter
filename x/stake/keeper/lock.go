@@ -54,6 +54,12 @@ func (k Keeper) SetLockByAddress(ctx sdk.Context, lock types.Lock) {
 	store.Set(lockKey, value)
 }
 
+func (k Keeper) DeleteLock(ctx sdk.Context, lock types.Lock) {
+	store := ctx.KVStore(k.storeKey)
+	lockKey := types.GetAddressLockStoreKey(lock.Owner)
+	store.Delete(lockKey)
+}
+
 // func (k Keeper) GetLockByID(ctx sdk.Context, lockID uint64) (*types.Lock, error) {
 // 	lock := types.Lock{}
 // 	store := ctx.KVStore(k.storeKey)
