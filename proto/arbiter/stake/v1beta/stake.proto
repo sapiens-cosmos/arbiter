@@ -24,7 +24,7 @@ message Epoch {
 message StakeState {
   string total_reserve = 1 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.moretags) = "yaml:\"weight\"",
+    (gogoproto.moretags) = "yaml:\"total_reserve\"",
     (gogoproto.nullable) = false
   ];
   Epoch epoch = 2 [ (gogoproto.nullable) = false ];
