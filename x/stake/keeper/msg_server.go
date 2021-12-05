@@ -24,7 +24,10 @@ var _ types.MsgServer = msgServer{}
 func (server msgServer) JoinStake(goCtx context.Context, msg *types.MsgJoinStake) (*types.MsgJoinStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	server.keeper.JoinStake(ctx, msg.Sender, msg.TokenIn)
+	err := server.keeper.JoinStake(ctx, msg.Sender, msg.TokenIn)
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.MsgJoinStakeResponse{}, nil
 }
@@ -32,7 +35,10 @@ func (server msgServer) JoinStake(goCtx context.Context, msg *types.MsgJoinStake
 func (server msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.MsgClaimResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	server.keeper.Claim(ctx, msg.Sender, msg.TokenIn)
+	err := server.keeper.Claim(ctx, msg.Sender, msg.TokenIn)
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.MsgClaimResponse{}, nil
 }

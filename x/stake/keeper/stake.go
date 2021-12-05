@@ -9,16 +9,23 @@ import (
 	"github.com/sapiens-cosmos/arbiter/x/stake/types"
 )
 
-func (k Keeper) JoinStake(ctx sdk.Context, address string, tokenIn sdk.Coin) {
+func (k Keeper) JoinStake(ctx sdk.Context, address string, tokenIn sdk.Coin) error {
 	k.Rebase(ctx)
-	k.bankKeeper.SendCoinsFromAccountToModule(ctx, sdk.AccAddress(address), types.ModuleName, sdk.Coins{tokenIn})
-	k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.Coins{sdk.NewCoin(appParams.BaseStakeCoinUnit, tokenIn.Amount)})
+	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sdk.AccAddress(address), types.ModuleName, sdk.Coins{tokenIn})
+	if err != nil {
+		return err
+	}
+	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.Coins{sdk.NewCoin(appParams.BaseStakeCoinUnit, tokenIn.Amount)})
+	if err != nil {
+		return err
+	}
 
 	lock := types.Lock{
 		Owner: address,
 		Coin:  sdk.NewCoin(appParams.BaseStakeCoinUnit, tokenIn.Amount),
 	}
 	k.SetLockByAddress(ctx, lock)
+	return nil
 }
 
 func (k Keeper) Rebase(ctx sdk.Context) {
