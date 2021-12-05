@@ -10,6 +10,9 @@ option go_package = "github.com/sapiens-cosmos/arbiter/x/bond/types";
 service Msg {
   // BondIn defines a method for bonding some amount of coin to receive the base coin.
   rpc BondIn(MsgBondIn) returns (MsgBondInResponse);
+
+  // Redeem defines a method for redeeming the debt from bonding.
+  rpc Redeem(MsgRedeem) returns (MsgRedeemResponse);
 }
 
 // MsgBondIn represents a message to bond some amount of coin to receive the base coin.
@@ -26,3 +29,14 @@ message MsgBondIn {
 
 // MsgBondInResponse defines the Msg/BondIn response type.
 message MsgBondInResponse {}
+
+// MsgRedeem represents a message to redeem the debt from bonding.
+message MsgRedeem {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string   bonder                    = 1 [(gogoproto.moretags) = "yaml:\"bonder\""];
+}
+
+// MsgRedeemResponse defines the Msg/Redeem response type.
+message MsgRedeemResponse {}
