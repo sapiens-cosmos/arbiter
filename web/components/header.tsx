@@ -23,6 +23,11 @@ const chainInfo: ChainInfo = {
       coinMinimalDenom: "uarb",
       coinDecimals: 6,
     },
+    {
+      coinDenom: "GREEN",
+      coinMinimalDenom: "ugreen",
+      coinDecimals: 6,
+    },
   ],
   feeCurrencies: [
     {
