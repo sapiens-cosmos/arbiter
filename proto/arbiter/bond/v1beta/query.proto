@@ -1,0 +1,85 @@
+syntax = "proto3";
+package arbiter.bond.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/sapiens-cosmos/arbiter/x/bond/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  rpc Redeemable(QueryRedeemableRequest) returns (QueryRedeemabeResponse) {
+    option (google.api.http).get =  "/arbiter/bond/v1beta1/redeemable/{bonder}";
+  }
+
+  rpc RiskFreePrice(QueryRiskFreePriceRequest) returns (QueryRiskFreePriceResponse) {
+    option (google.api.http).get =  "/arbiter/bond/v1beta1/risk_free_price/{bond_denom}";
+  }
+
+  rpc Premium(QueryPremiumRequest) returns (QueryPremiumResponse) {
+    option (google.api.http).get =  "/arbiter/bond/v1beta1/premium/{bond_denom}";
+  }
+
+  rpc BondInfo(QueryBondInfoRequest) returns (QueryBondInfoResponse) {
+    option (google.api.http).get =  "/arbiter/bond/v1beta1/bond_info/{bond_denom}";
+  }
+}
+
+message QueryRedeemableRequest {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string bonder = 1;
+}
+
+message QueryRedeemabeResponse {
+  cosmos.base.v1beta1.Coin coin = 1;
+}
+
+message QueryRiskFreePriceRequest {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string bond_denom = 1;
+}
+
+message QueryRiskFreePriceResponse {
+  string price = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+  ];
+}
+
+message QueryPremiumRequest {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string bond_denom = 1;
+}
+
+message QueryPremiumResponse {
+  string premium = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+  ];
+}
+
+
+message QueryBondInfoRequest {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string bond_denom = 1;
+}
+
+message QueryBondInfoResponse {
+  string risk_free_price = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+  ];
+  string premium = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+  ];
+  string executing_price = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+  ];
+}
+

@@ -6,6 +6,22 @@ import (
 	"github.com/sapiens-cosmos/arbiter/x/bond/types"
 )
 
+func (k Keeper) RedeeambleDebt(ctx sdk.Context, bonder sdk.AccAddress) (sdk.Coin, error) {
+	debt, err := k.GetDebt(ctx, bonder)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	heightSince := ctx.BlockHeight() - debt.LastHeight
+	vestedRatio := heightSince / debt.RemainingHeight
+
+	if vestedRatio >= 0 {
+		return sdk.NewCoin(k.GetBaseDenom(ctx), debt.Amount), nil
+	}
+	payoutAmount := debt.Amount.ToDec().MulInt64(vestedRatio).TruncateInt()
+	return sdk.NewCoin(k.GetBaseDenom(ctx), payoutAmount), nil
+}
+
 func (k Keeper) RedeemDebt(ctx sdk.Context, bonder sdk.AccAddress) error {
 	debt, err := k.GetDebt(ctx, bonder)
 	if err != nil {
