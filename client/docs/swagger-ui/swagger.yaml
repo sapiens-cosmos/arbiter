@@ -48,6 +48,63 @@ paths:
           type: string
       tags:
         - Query
+  /arbiter/bond/v1beta1/params:
+    get:
+      operationId: BondParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                type: object
+                properties:
+                  policies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        bond_type:
+                          type: string
+                          enum:
+                            - RESERVE
+                            - LIQUIDITY
+                          default: RESERVE
+                        bond_denom:
+                          type: string
+                        control_variable:
+                          type: string
+                          title: BCV
+                        vesting_height:
+                          type: string
+                          format: int64
+                          title: vestingHeight represented in blocks
+                description: Params defines the parameters for the bond module.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
   /arbiter/bond/v1beta1/premium/{bond_denom}:
     get:
       operationId: Premium
@@ -219,6 +276,45 @@ paths:
           in: path
           required: true
           type: string
+      tags:
+        - Query
+  /arbiter/stake/v1beta1/params:
+    get:
+      operationId: StakeParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                type: object
+                properties:
+                  reward_rate:
+                    type: string
+                description: Params defines the parameters for the stake module.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
       tags:
         - Query
   /arbiter/stake/v1beta1/reward_yield:
@@ -21559,6 +21655,54 @@ paths:
       tags:
         - Query
 definitions:
+  arbiter.bond.v1beta1.BondPolicy:
+    type: object
+    properties:
+      bond_type:
+        type: string
+        enum:
+          - RESERVE
+          - LIQUIDITY
+        default: RESERVE
+      bond_denom:
+        type: string
+      control_variable:
+        type: string
+        title: BCV
+      vesting_height:
+        type: string
+        format: int64
+        title: vestingHeight represented in blocks
+  arbiter.bond.v1beta1.BondType:
+    type: string
+    enum:
+      - RESERVE
+      - LIQUIDITY
+    default: RESERVE
+  arbiter.bond.v1beta1.Params:
+    type: object
+    properties:
+      policies:
+        type: array
+        items:
+          type: object
+          properties:
+            bond_type:
+              type: string
+              enum:
+                - RESERVE
+                - LIQUIDITY
+              default: RESERVE
+            bond_denom:
+              type: string
+            control_variable:
+              type: string
+              title: BCV
+            vesting_height:
+              type: string
+              format: int64
+              title: vestingHeight represented in blocks
+    description: Params defines the parameters for the bond module.
   arbiter.bond.v1beta1.QueryBondInfoResponse:
     type: object
     properties:
@@ -21568,6 +21712,33 @@ definitions:
         type: string
       executing_price:
         type: string
+  arbiter.bond.v1beta1.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        type: object
+        properties:
+          policies:
+            type: array
+            items:
+              type: object
+              properties:
+                bond_type:
+                  type: string
+                  enum:
+                    - RESERVE
+                    - LIQUIDITY
+                  default: RESERVE
+                bond_denom:
+                  type: string
+                control_variable:
+                  type: string
+                  title: BCV
+                vesting_height:
+                  type: string
+                  format: int64
+                  title: vestingHeight represented in blocks
+        description: Params defines the parameters for the bond module.
   arbiter.bond.v1beta1.QueryPremiumResponse:
     type: object
     properties:
@@ -21934,11 +22105,26 @@ definitions:
                   "@type": "type.googleapis.com/google.protobuf.Duration",
                   "value": "1.212s"
                 }
+  arbiter.stake.v1beta1.Params:
+    type: object
+    properties:
+      reward_rate:
+        type: string
+    description: Params defines the parameters for the stake module.
   arbiter.stake.v1beta1.QueryBalanceResponse:
     type: object
     properties:
       balance:
         type: string
+  arbiter.stake.v1beta1.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        type: object
+        properties:
+          reward_rate:
+            type: string
+        description: Params defines the parameters for the stake module.
   arbiter.stake.v1beta1.QueryRewardYieldResponse:
     type: object
     properties:

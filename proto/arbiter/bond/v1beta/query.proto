@@ -4,6 +4,7 @@ package arbiter.bond.v1beta1;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "arbiter/bond/v1beta/params.proto";
 
 option go_package = "github.com/sapiens-cosmos/arbiter/x/bond/types";
 
@@ -23,6 +24,10 @@ service Query {
 
   rpc BondInfo(QueryBondInfoRequest) returns (QueryBondInfoResponse) {
     option (google.api.http).get =  "/arbiter/bond/v1beta1/bond_info/{bond_denom}";
+  }
+
+  rpc Params(QueryParamsRequest) returns(QueryParamsResponse) {
+    option (google.api.http).get = "/arbiter/bond/v1beta1/params";
   }
 }
 
@@ -83,3 +88,7 @@ message QueryBondInfoResponse {
   ];
 }
 
+message QueryParamsRequest{}
+message QueryParamsResponse {
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}

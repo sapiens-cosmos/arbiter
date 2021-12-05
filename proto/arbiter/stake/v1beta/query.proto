@@ -4,6 +4,7 @@ package arbiter.stake.v1beta1;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
+import "arbiter/stake/v1beta/params.proto";
 
 option go_package = "github.com/sapiens-cosmos/arbiter/x/stake/types";
 
@@ -26,6 +27,9 @@ service Query {
     }
     rpc TotalReserve(QueryTotalReserveRequest) returns (QueryTotalReserveResponse) {
         option (google.api.http).get = "/arbiter/stake/v1beta1/total_reserve";
+    }
+    rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+        option (google.api.http).get = "/arbiter/stake/v1beta1/params";
     }
 }
 
@@ -84,4 +88,9 @@ message QueryStakeInfoResponse {
 message QueryTotalReserveRequest  {}
 message QueryTotalReserveResponse  {
     int64 totalReserve = 1;
+}
+
+message QueryParamsRequest {}
+message QueryParamsResponse {
+    Params params = 1 [ (gogoproto.nullable) = false ];
 }
