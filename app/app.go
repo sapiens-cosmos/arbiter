@@ -97,7 +97,7 @@ import (
 	staketypes "github.com/sapiens-cosmos/arbiter/x/stake/types"
 
 	// unnamed import of statik for swagger UI support
-	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
+	_ "github.com/sapiens-cosmos/arbiter/client/docs/statik"
 )
 
 const appName = "App"
