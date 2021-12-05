@@ -28,7 +28,7 @@ func (k Keeper) JoinStake(ctx sdk.Context, address string, tokenIn sdk.Coin) err
 	return nil
 }
 
-func (k Keeper) Rebase(ctx sdk.Context) {
+func (k Keeper) Rebase(ctx sdk.Context) error {
 	epoch := k.GetEpoch(ctx)
 	if epoch.EndBlock < ctx.BlockHeight() {
 		k.RebaseToken(ctx, epoch.Distribute, epoch.Number)
@@ -36,7 +36,10 @@ func (k Keeper) Rebase(ctx sdk.Context) {
 		epoch.EndBlock += epoch.Length
 		epoch.Number++
 
-		k.Distribute(ctx)
+		err := k.Distribute(ctx)
+		if err != nil {
+			return err
+		}
 
 		moduleAccountBalance := k.GetModuleAccountBalance(ctx)
 		staked := k.CirculatingSupply(ctx)
@@ -102,7 +105,10 @@ func (k Keeper) Claim(ctx sdk.Context, address string, amount sdk.Int) error {
 
 	// send base Token to user account
 	receiveCoin := sdk.NewCoin(appParams.BaseCoinUnit, amount)
-	k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(address), sdk.Coins{receiveCoin})
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(address), sdk.Coins{receiveCoin})
+	if err != nil {
+		return err
+	}
 
 	// update lock and share status
 	lock, err := k.GetLockByAddress(ctx, address)

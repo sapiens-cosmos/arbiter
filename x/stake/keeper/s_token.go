@@ -26,10 +26,14 @@ func (k Keeper) GetModuleAccountSTokenBalance(ctx sdk.Context) sdk.Coin {
 }
 
 // CreateModuleAccount creates module account with baseToken and sToken minted
-func (k Keeper) CreateModuleAccount(ctx sdk.Context, coins sdk.Coins) {
+func (k Keeper) CreateModuleAccount(ctx sdk.Context, coins sdk.Coins) error{
 	moduleAcc := authtypes.NewEmptyModuleAccount(types.ModuleName, authtypes.Minter)
 	k.accountKeeper.SetModuleAccount(ctx, moduleAcc)
-	k.bankKeeper.MintCoins(ctx, types.ModuleName, coins)
+	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, coins)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // RebaseToken increases sToken supply to increase staking balances relative to profit

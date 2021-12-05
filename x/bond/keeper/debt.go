@@ -21,24 +21,23 @@ func (k Keeper) RedeemDebt(ctx sdk.Context, bonder sdk.AccAddress) error {
 		return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, bonder, sdk.NewCoins(
 			sdk.NewCoin(k.GetBaseDenom(ctx), debt.Amount),
 		))
-	} else {
-		payoutAmount := debt.Amount.ToDec().MulInt64(vestedRatio).TruncateInt()
-
-		newDebt := types.Debt{
-			Amount:          debt.Amount.Sub(payoutAmount),
-			RemainingHeight: debt.RemainingHeight - (ctx.BlockHeight() - debt.LastHeight),
-			LastHeight:      ctx.BlockHeight(),
-		}
-
-		err := k.setDebt(ctx, newDebt, bonder)
-		if err != nil {
-			return err
-		}
-
-		return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, bonder, sdk.NewCoins(
-			sdk.NewCoin(k.GetBaseDenom(ctx), payoutAmount),
-		))
 	}
+	payoutAmount := debt.Amount.ToDec().MulInt64(vestedRatio).TruncateInt()
+
+	newDebt := types.Debt{
+		Amount:          debt.Amount.Sub(payoutAmount),
+		RemainingHeight: debt.RemainingHeight - (ctx.BlockHeight() - debt.LastHeight),
+		LastHeight:      ctx.BlockHeight(),
+	}
+
+	err = k.setDebt(ctx, newDebt, bonder)
+	if err != nil {
+		return err
+	}
+
+	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, bonder, sdk.NewCoins(
+		sdk.NewCoin(k.GetBaseDenom(ctx), payoutAmount),
+	))
 }
 
 func (k Keeper) AddDebt(ctx sdk.Context, bonder sdk.AccAddress, bondDenom string, amount sdk.Int) error {
