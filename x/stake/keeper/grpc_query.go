@@ -80,17 +80,9 @@ func (q queryServer) RewardYield(ctx context.Context, req *types.QueryRewardYiel
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 
-	if req.Sender == "" {
-		return nil, status.Error(codes.InvalidArgument, "sender cannot be empty")
-	}
-
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	address, err := sdk.AccAddressFromBech32(req.Sender)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid address: %s", err.Error())
-	}
 
-	rewardYield := q.keeper.GetRewardYield(sdkCtx, address)
+	rewardYield := q.keeper.GetRewardYield(sdkCtx)
 
 	return &types.QueryRewardYieldResponse{RewardYield: &rewardYield}, nil
 }
@@ -116,7 +108,7 @@ func (q queryServer) StakeInfo(ctx context.Context, req *types.QueryStakeInfoReq
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	blockUntilRebase := q.keeper.GetBlockUntilRebase(sdkCtx)
-	rewardYield := q.keeper.GetRewardYield(sdkCtx, address)
+	rewardYield := q.keeper.GetRewardYield(sdkCtx)
 
 	return &types.QueryStakeInfoResponse{Balance: &balance, Staked: &staked, BlockUntilRebase: blockUntilRebase, RewardYield: &rewardYield}, nil
 }

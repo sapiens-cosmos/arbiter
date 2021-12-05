@@ -181,7 +181,7 @@ paths:
           type: string
       tags:
         - Query
-  /arbiter/stake/v1beta1/balance:
+  /arbiter/stake/v1beta1/balance/{sender}:
     get:
       operationId: StakeBalance
       responses:
@@ -216,8 +216,8 @@ paths:
                       format: byte
       parameters:
         - name: sender
-          in: query
-          required: false
+          in: path
+          required: true
           type: string
       tags:
         - Query
@@ -254,14 +254,9 @@ paths:
                     value:
                       type: string
                       format: byte
-      parameters:
-        - name: sender
-          in: query
-          required: false
-          type: string
       tags:
         - Query
-  /arbiter/stake/v1beta1/stake_info:
+  /arbiter/stake/v1beta1/stake_info/{sender}:
     get:
       operationId: StakeInfo
       responses:
@@ -303,12 +298,12 @@ paths:
                       format: byte
       parameters:
         - name: sender
-          in: query
-          required: false
+          in: path
+          required: true
           type: string
       tags:
         - Query
-  /arbiter/stake/v1beta1/staked:
+  /arbiter/stake/v1beta1/staked/{sender}:
     get:
       operationId: Staked
       responses:
@@ -343,8 +338,8 @@ paths:
                       format: byte
       parameters:
         - name: sender
-          in: query
-          required: false
+          in: path
+          required: true
           type: string
       tags:
         - Query

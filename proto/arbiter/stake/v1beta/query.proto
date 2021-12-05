@@ -10,10 +10,10 @@ option go_package = "github.com/sapiens-cosmos/arbiter/x/stake/types";
 // Query defines the gRPC querier service.
 service Query {
     rpc Balance(QueryBalanceRequest) returns (QueryBalanceResponse) {
-        option (google.api.http).get = "/arbiter/stake/v1beta1/balance";
+        option (google.api.http).get = "/arbiter/stake/v1beta1/balance/{sender}";
     }
     rpc Staked(QueryStakedRequest) returns (QueryStakedResponse) {
-        option (google.api.http).get = "/arbiter/stake/v1beta1/staked";
+        option (google.api.http).get = "/arbiter/stake/v1beta1/staked/{sender}";
     }
     rpc TimeUntilRebase(QueryTimeUntilRebaseRequest) returns(QueryTimeUntilRebaseResponse) {
         option (google.api.http).get = "/arbiter/stake/v1beta1/time_until_rebase";
@@ -22,7 +22,7 @@ service Query {
         option (google.api.http).get = "/arbiter/stake/v1beta1/reward_yield";
     }
     rpc StakeInfo(QueryStakeInfoRequest) returns (QueryStakeInfoResponse) {
-        option (google.api.http).get = "/arbiter/stake/v1beta1/stake_info";
+        option (google.api.http).get = "/arbiter/stake/v1beta1/stake_info/{sender}";
     }
 }
 
@@ -53,9 +53,7 @@ message QueryTimeUntilRebaseResponse {
 }
 
 //=============================== RewardYield
-message QueryRewardYieldRequest {
-    string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
-}
+message QueryRewardYieldRequest {}
 message QueryRewardYieldResponse {
     string rewardYield = 1 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
