@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankexported "github.com/cosmos/cosmos-sdk/x/bank/exported"
 )
 
 // AccountKeeper defines the expected account keeper used for simulations (noalias)
@@ -19,7 +20,7 @@ type BankKeeper interface {
 	LockedCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 
-	GetSupply(ctx sdk.Context, denom string) sdk.Coin
+	GetSupply(ctx sdk.Context) bankexported.SupplyI
 
 	SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
 	SendCoinsFromModuleToModule(ctx sdk.Context, senderPool, recipientPool string, amt sdk.Coins) error

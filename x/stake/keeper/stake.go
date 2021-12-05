@@ -163,9 +163,9 @@ func (k Keeper) Claim(ctx sdk.Context, address string, amount sdk.Int) error {
 }
 
 func (k Keeper) GetTotalReward(ctx sdk.Context) sdk.Dec {
-	totalSupply := k.bankKeeper.GetSupply(ctx, appParams.BaseCoinUnit)
+	totalSupply := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(appParams.BaseCoinUnit)
 	rewardRate := k.GetParams(ctx).RewardRate
-	return sdk.NewDecFromInt(totalSupply.Amount).Quo(rewardRate)
+	return sdk.NewDecFromInt(totalSupply).Quo(rewardRate)
 }
 
 func (k Keeper) AddTotalReserve(ctx sdk.Context, reserve sdk.Int) {
@@ -200,7 +200,7 @@ func (k Keeper) SetStakeState(ctx sdk.Context, stakeState types.StakeState) {
 }
 
 func (k Keeper) excessReserves(ctx sdk.Context) sdk.Int {
-	totalSupply := k.bankKeeper.GetSupply(ctx, appParams.BaseCoinUnit)
+	totalSupply := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(appParams.BaseCoinUnit)
 	totalReserve := k.GetStakeState(ctx).TotalReserve
-	return totalReserve.Sub(totalSupply.Amount)
+	return totalReserve.Sub(totalSupply)
 }
