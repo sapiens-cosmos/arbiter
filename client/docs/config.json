@@ -18,7 +18,8 @@
       "url": "./tmp-swagger-gen/arbiter/stake/v1beta/query.swagger.json",
       "operationIds": {
         "rename": {
-          "Params": "StakeParams"
+          "Params": "StakeParams",
+          "Balance": "StakeBalance"
         }
       }
     },

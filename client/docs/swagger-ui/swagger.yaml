@@ -181,6 +181,209 @@ paths:
           type: string
       tags:
         - Query
+  /arbiter/stake/v1beta1/balance:
+    get:
+      operationId: StakeBalance
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              balance:
+                type: string
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: sender
+          in: query
+          required: false
+          type: string
+      tags:
+        - Query
+  /arbiter/stake/v1beta1/reward_yield:
+    get:
+      operationId: RewardYield
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              rewardYield:
+                type: string
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: sender
+          in: query
+          required: false
+          type: string
+      tags:
+        - Query
+  /arbiter/stake/v1beta1/stake_info:
+    get:
+      operationId: StakeInfo
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              balance:
+                type: string
+              staked:
+                type: string
+              blockUntilRebase:
+                type: string
+                format: int64
+              rewardYield:
+                type: string
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: sender
+          in: query
+          required: false
+          type: string
+      tags:
+        - Query
+  /arbiter/stake/v1beta1/staked:
+    get:
+      operationId: Staked
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              staked:
+                type: string
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: sender
+          in: query
+          required: false
+          type: string
+      tags:
+        - Query
+  /arbiter/stake/v1beta1/time_until_rebase:
+    get:
+      operationId: TimeUntilRebase
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              blockUntilRebase:
+                type: string
+                format: int64
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
   /node_info:
     get:
       description: Information about the connected node
@@ -21700,6 +21903,39 @@ definitions:
                   "@type": "type.googleapis.com/google.protobuf.Duration",
                   "value": "1.212s"
                 }
+  arbiter.stake.v1beta1.QueryBalanceResponse:
+    type: object
+    properties:
+      balance:
+        type: string
+  arbiter.stake.v1beta1.QueryRewardYieldResponse:
+    type: object
+    properties:
+      rewardYield:
+        type: string
+  arbiter.stake.v1beta1.QueryStakeInfoResponse:
+    type: object
+    properties:
+      balance:
+        type: string
+      staked:
+        type: string
+      blockUntilRebase:
+        type: string
+        format: int64
+      rewardYield:
+        type: string
+  arbiter.stake.v1beta1.QueryStakedResponse:
+    type: object
+    properties:
+      staked:
+        type: string
+  arbiter.stake.v1beta1.QueryTimeUntilRebaseResponse:
+    type: object
+    properties:
+      blockUntilRebase:
+        type: string
+        format: int64
   CheckTxResult:
     type: object
     properties:
