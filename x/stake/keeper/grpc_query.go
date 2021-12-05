@@ -120,15 +120,19 @@ func (q queryServer) TotalReserve(ctx context.Context, req *types.QueryTotalRese
 
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
-	// balance := q.keeper.GetBalance(sdkCtx, address)
-	// staked, err := q.keeper.GetStakedTokenByAddress(sdkCtx, address)
-	// if err != nil {
-	// 	return nil, status.Error(codes.Internal, err.Error())
-	// }
-	// blockUntilRebase := q.keeper.GetBlockUntilRebase(sdkCtx)
-	// rewardYield := q.keeper.GetRewardYield(sdkCtx)
-
 	totalReserve := q.keeper.GetTotalReserve(sdkCtx).Int64()
 
 	return &types.QueryTotalReserveResponse{TotalReserve: totalReserve}, nil
+}
+
+func (q queryServer) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	params := q.keeper.GetParams(sdkCtx)
+
+	return &types.QueryParamsResponse{Params: params}, nil
 }

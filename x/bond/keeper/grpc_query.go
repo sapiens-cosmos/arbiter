@@ -112,3 +112,15 @@ func (q queryServer) BondInfo(ctx context.Context, req *types.QueryBondInfoReque
 		ExecutingPrice: &executingPrice,
 	}, nil
 }
+
+func (q queryServer) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	params := q.keeper.GetParams(sdkCtx)
+
+	return &types.QueryParamsResponse{Params: params}, nil
+}
