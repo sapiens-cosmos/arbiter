@@ -319,7 +319,7 @@ func NewApp(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.StakeKeeper = stakekeeper.NewKeeper(appCodec, app.GetSubspace(staketypes.ModuleName), keys[staketypes.StoreKey], app.BankKeeper, app.GetSubspace(staketypes.ModuleName))
+	app.StakeKeeper = stakekeeper.NewKeeper(appCodec, app.GetSubspace(staketypes.ModuleName), keys[staketypes.StoreKey], app.AccountKeeper, app.BankKeeper, app.GetSubspace(staketypes.ModuleName))
 	app.BondKeeper = bondkeeper.NewKeeper(appCodec, keys[bondtypes.StoreKey], app.BankKeeper, app.GetSubspace(bondtypes.ModuleName), staketypes.ModuleName, app.StakeKeeper)
 	/****  Module Options ****/
 
