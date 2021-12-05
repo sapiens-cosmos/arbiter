@@ -4,26 +4,47 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/gogo/protobuf/proto"
 	appParams "github.com/sapiens-cosmos/arbiter/app/params"
 	"github.com/sapiens-cosmos/arbiter/x/stake/types"
 )
 
 func (k Keeper) JoinStake(ctx sdk.Context, address string, tokenIn sdk.Coin) error {
-	k.Rebase(ctx)
-	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sdk.AccAddress(address), types.ModuleName, sdk.Coins{tokenIn})
+	err := k.Rebase(ctx)
 	if err != nil {
 		return err
 	}
-	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.Coins{sdk.NewCoin(appParams.BaseStakeCoinUnit, tokenIn.Amount)})
+	accAddress, err := sdk.AccAddressFromBech32(address)
+	if err != nil {
+		return err
+	}
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, accAddress, types.ModuleName, sdk.Coins{tokenIn})
+	if err != nil {
+		return err
+	}
+	sTokens := sdk.NewCoin(appParams.BaseStakeCoinUnit, tokenIn.Amount)
+	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.Coins{sTokens})
 	if err != nil {
 		return err
 	}
 
-	lock := types.Lock{
-		Owner: address,
-		Coin:  sdk.NewCoin(appParams.BaseStakeCoinUnit, tokenIn.Amount),
+	lock, err := k.GetLockByAddress(ctx, address)
+	if err != nil {
+		sdkErr, ok := err.(sdkerrors.Error)
+		if ok && sdkErr.Is(types.ErrNoLock) {
+			lock = types.Lock{
+				Owner: address,
+				Coin:  sTokens,
+			}
+			k.SetLockByAddress(ctx, lock)
+			return nil
+		} else {
+			return err
+		}
 	}
+
+	lock.Coin.Add(sTokens)
 	k.SetLockByAddress(ctx, lock)
 	return nil
 }
@@ -79,7 +100,11 @@ func (k Keeper) Distribute(ctx sdk.Context) error {
 			return err
 		}
 
-		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(lock.Owner), sdk.Coins{rewardInSToken})
+		accAddress, err := sdk.AccAddressFromBech32(lock.Owner)
+		if err != nil {
+			return err
+		}
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, accAddress, sdk.Coins{rewardInSToken})
 		if err != nil {
 			return err
 		}
@@ -95,7 +120,11 @@ func (k Keeper) Claim(ctx sdk.Context, address string, amount sdk.Int) error {
 	returnCoin := sdk.NewCoin(appParams.BaseStakeCoinUnit, amount)
 
 	// send sTokens from user to module account, then burn
-	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sdk.AccAddress(address), types.ModuleName, sdk.Coins{returnCoin})
+	accAddress, err := sdk.AccAddressFromBech32(address)
+	if err != nil {
+		return err
+	}
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, accAddress, types.ModuleName, sdk.Coins{returnCoin})
 	if err != nil {
 		return err
 	}
@@ -106,7 +135,11 @@ func (k Keeper) Claim(ctx sdk.Context, address string, amount sdk.Int) error {
 
 	// send base Token to user account
 	receiveCoin := sdk.NewCoin(appParams.BaseCoinUnit, amount)
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(address), sdk.Coins{receiveCoin})
+	accAddress, err = sdk.AccAddressFromBech32(address)
+	if err != nil {
+		return err
+	}
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, accAddress, sdk.Coins{receiveCoin})
 	if err != nil {
 		return err
 	}

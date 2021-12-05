@@ -1,10 +1,9 @@
 package keeper
 
 import (
-	"fmt"
-
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/sapiens-cosmos/arbiter/x/stake/types"
 )
@@ -31,7 +30,7 @@ func (k Keeper) GetLockByAddress(ctx sdk.Context, address string) (types.Lock, e
 	store := ctx.KVStore(k.storeKey)
 	lockKey := types.GetAddressLockStoreKey(address)
 	if !store.Has(lockKey) {
-		return types.Lock{}, fmt.Errorf("lock of address %s does not exist", address)
+		return types.Lock{}, sdkerrors.Wrap(types.ErrNoLock, address)
 	}
 
 	bz := store.Get(lockKey)
