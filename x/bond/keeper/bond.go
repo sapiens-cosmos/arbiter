@@ -44,8 +44,19 @@ func (k Keeper) BondIn(ctx sdk.Context, bonder sdk.AccAddress, coin sdk.Coin) er
 		return err
 	}
 
-	// profit := debtAmount.Mul(executingPrice.Sub(riskFreePrice))
-	panic("add logic to distribute profit to the stakers")
+	profit := debtAmount.Mul(executingPrice.Sub(riskFreePrice))
+	// Mint the profit and move the profit to the treasury
+	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(k.GetBaseDenom(ctx), profit)))
+	if err != nil {
+		return err
+	}
+	err = k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, k.treasuryModuleName, sdk.NewCoins(sdk.NewCoin(k.GetBaseDenom(ctx), profit)))
+	if err != nil {
+		return err
+	}
+	k.treasuryKeeper.AddTotalReserve(ctx, profit)
+
+	return nil
 }
 
 // GetPremium returns the premium to calculate the executing price.
