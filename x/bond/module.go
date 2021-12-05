@@ -17,9 +17,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
+	"github.com/sapiens-cosmos/arbiter/x/bond/client/cli"
 	"github.com/sapiens-cosmos/arbiter/x/bond/keeper"
 	"github.com/sapiens-cosmos/arbiter/x/bond/types"
-	"github.com/sapiens-cosmos/arbiter/x/bond/client/cli"
 )
 
 var (
@@ -89,7 +89,7 @@ func (AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) 
 type AppModule struct {
 	AppModuleBasic
 
-	keeper        keeper.Keeper
+	keeper keeper.Keeper
 }
 
 // RegisterServices registers module services.
