@@ -5,7 +5,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "localnet": "sh ./scripts/run-localnet.sh",
+    "localnet:stop": "docker rm --force arbiter_localnet"
   },
   "dependencies": {
     "@keplr-wallet/cosmos": "^0.9.9",
