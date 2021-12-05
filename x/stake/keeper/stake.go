@@ -23,6 +23,15 @@ func (k Keeper) Rebase(ctx sdk.Context) {
 
 		k.Distribute(ctx)
 
+		moduleAccountBalance := k.GetModuleAccountBalance(ctx)
+		staked := k.CirculatingSupply(ctx)
+
+		if moduleAccountBalance.Amount.LTE(staked.Amount) {
+			epoch.Distribute = 0
+		} else {
+			epoch.Distribute = moduleAccountBalance.Sub(staked).Amount.Int64()
+		}
+
 		k.SetEpoch(ctx, epoch)
 	}
 }
@@ -42,14 +51,21 @@ func (k Keeper) Distribute(ctx sdk.Context) error {
 	// the reward(sToken) relative to share gets minted to module account
 	for _, lock := range locks {
 		share := lock.Coin.Amount.ToDec().Quo(moduleAccountSTokenBalance.Amount.ToDec())
-		reward := sdk.NewCoin(appParams.BaseStakeCoinUnit, totalReward.Mul(share).TruncateInt())
+		reward := totalReward.Mul(share).TruncateInt()
+		rewardInBaseToken := sdk.NewCoin(appParams.BaseCoinUnit, reward)
+		rewardInSToken := sdk.NewCoin(appParams.BaseStakeCoinUnit, reward)
 
-		err := k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.Coins{reward})
+		err := k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.Coins{rewardInBaseToken, rewardInSToken})
 		if err != nil {
 			return err
 		}
 
-		lock.Coin.Add(reward)
+		err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(lock.Owner), sdk.Coins{rewardInSToken})
+		if err != nil {
+			return err
+		}
+
+		lock.Coin = lock.Coin.Add(rewardInSToken)
 		k.SetLockByAddress(ctx, lock)
 	}
 	return nil
