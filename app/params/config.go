@@ -1,6 +1,6 @@
 package params
 
 const (
-	BaseCoinUnit      = "uarb"
-	BaseStakeCoinUnit = "usarb"
+	BaseCoinUnit      = "urecall"
+	BaseStakeCoinUnit = "usrecall"
 )
