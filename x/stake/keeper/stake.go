@@ -50,7 +50,7 @@ func (k Keeper) Distribute(ctx sdk.Context) error {
 	moduleAccountSTokenBalance := k.GetModuleAccountSTokenBalance(ctx)
 
 	if totalReward.LT(sdk.NewDecFromInt(k.excessReserves(ctx))) {
-		return fmt.Errorf("Insufficient Reserves")
+		return fmt.Errorf("insufficient Reserves")
 	}
 
 	locks := k.GetAllLocks(ctx)
@@ -117,17 +117,8 @@ func (k Keeper) Claim(ctx sdk.Context, address string, amount sdk.Int) error {
 
 func (k Keeper) GetTotalReward(ctx sdk.Context) sdk.Dec {
 	totalSupply := k.bankKeeper.GetSupply(ctx, appParams.BaseCoinUnit)
-	if totalSupply.Amount.LT(sdk.NewInt(1_000_000)) {
-		return sdk.NewDecFromInt(totalSupply.Amount).Quo(sdk.MustNewDecFromStr("0.3058"))
-	} else if totalSupply.Amount.GT(sdk.NewInt(1_000_000)) && totalSupply.Amount.LT(sdk.NewInt(10_000_000)) {
-		return sdk.NewDecFromInt(totalSupply.Amount).Quo(sdk.MustNewDecFromStr("0.1587"))
-	} else if totalSupply.Amount.GT(sdk.NewInt(10_000_000)) && totalSupply.Amount.LT(sdk.NewInt(100_000_000)) {
-		return sdk.NewDecFromInt(totalSupply.Amount).Quo(sdk.MustNewDecFromStr("0.1186"))
-	} else if totalSupply.Amount.GT(sdk.NewInt(100_000_000)) && totalSupply.Amount.LT(sdk.NewInt(1_000_000_000)) {
-		return sdk.NewDecFromInt(totalSupply.Amount).Quo(sdk.MustNewDecFromStr("0.0408"))
-	} else {
-		return sdk.NewDecFromInt(totalSupply.Amount).Quo(sdk.MustNewDecFromStr("0.0019"))
-	}
+	rewardRate := k.GetParams(ctx).RewardRate
+	return sdk.NewDecFromInt(totalSupply.Amount).Quo(rewardRate)
 }
 
 func (k Keeper) AddTotalReserve(ctx sdk.Context, reserve sdk.Int) {

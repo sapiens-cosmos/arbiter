@@ -9,6 +9,7 @@ option go_package = "github.com/sapiens-cosmos/arbiter/x/stake/types";
 // Msg defines the stake Msg service.
 service Msg {
   rpc JoinStake(MsgJoinStake) returns (MsgJoinStakeResponse);
+  rpc Claim(MsgClaim) returns (MsgClaimResponse);
 }
 
 message MsgJoinStake {
@@ -23,3 +24,17 @@ message MsgJoinStake {
 }
 
 message MsgJoinStakeResponse {}
+
+message MsgClaim {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  string token_in = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.moretags) = "yaml:\"token_in\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgClaimResponse {}

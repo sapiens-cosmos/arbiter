@@ -12,6 +12,8 @@ const (
 
 	// QuerierRoute defines the module's query routing key
 	QuerierRoute = ModuleName
+
+	ParamsKey = "params"
 )
 
 var (

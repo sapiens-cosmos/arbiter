@@ -10,7 +10,7 @@ message Lock {
   string owner = 1 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
   cosmos.base.v1beta1.Coin coin = 2 [
       (gogoproto.nullable) = false,
-      (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+      (gogoproto.moretags) = "yaml:\"lock_balance\""
   ];
 }
 

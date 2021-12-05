@@ -23,32 +23,16 @@ var _ types.MsgServer = msgServer{}
 
 func (server msgServer) JoinStake(goCtx context.Context, msg *types.MsgJoinStake) (*types.MsgJoinStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	sender, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		return nil, err
-	}
+
+	server.keeper.JoinStake(ctx, msg.Sender, msg.TokenIn)
 
 	return &types.MsgJoinStakeResponse{}, nil
 }
 
-// func (server msgServer) CreateGauge(goCtx context.Context, msg *types.MsgCreateGauge) (*types.MsgCreateGaugeResponse, error) {
-// ctx := sdk.UnwrapSDKContext(goCtx)
-// owner, err := sdk.AccAddressFromBech32(msg.Owner)
-// if err != nil {
-// 	return nil, err
-// }
+func (server msgServer) Claim(goCtx context.Context, msg *types.MsgClaim) (*types.MsgClaimResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
-// 	gaugeID, err := server.keeper.CreateGauge(ctx, msg.IsPerpetual, owner, msg.Coins, msg.DistributeTo, msg.StartTime, msg.NumEpochsPaidOver)
-// 	if err != nil {
-// 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
-// 	}
+	server.keeper.Claim(ctx, msg.Sender, msg.TokenIn)
 
-// 	ctx.EventManager().EmitEvents(sdk.Events{
-// 		sdk.NewEvent(
-// 			types.TypeEvtCreateGauge,
-// 			sdk.NewAttribute(types.AttributeGaugeID, utils.Uint64ToString(gaugeID)),
-// 		),
-// 	})
-
-// 	return &types.MsgCreateGaugeResponse{}, nil
-// }
+	return &types.MsgClaimResponse{}, nil
+}
