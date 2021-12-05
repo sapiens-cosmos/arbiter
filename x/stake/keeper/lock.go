@@ -57,3 +57,11 @@ func (k Keeper) DeleteLock(ctx sdk.Context, lock types.Lock) {
 	lockKey := types.GetAddressLockStoreKey(lock.Owner)
 	store.Delete(lockKey)
 }
+
+func (k Keeper) GetStakedTokenByAddress(ctx sdk.Context, address sdk.AccAddress) (sdk.Int, error) {
+	lock, err := k.GetLockByAddress(ctx, address.String())
+	if err != nil {
+		return sdk.Int{}, err
+	}
+	return lock.Coin.Amount, nil
+}

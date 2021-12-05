@@ -9,4 +9,72 @@ option go_package = "github.com/sapiens-cosmos/arbiter/x/stake/types";
 
 // Query defines the gRPC querier service.
 service Query {
+    rpc Balance(QueryBalanceRequest) returns (QueryBalanceResponse) {
+        option (google.api.http).get = "/arbiter/stake/v1beta1/balance";
+    }
+    rpc Staked(QueryStakedRequest) returns (QueryStakedResponse) {
+        option (google.api.http).get = "/arbiter/stake/v1beta1/staked";
+    }
+    rpc TimeUntilRebase(QueryTimeUntilRebaseRequest) returns(QueryTimeUntilRebaseResponse) {
+        option (google.api.http).get = "/arbiter/stake/v1beta1/time_until_rebase";
+    }
+    rpc RewardYield(QueryRewardYieldRequest) returns(QueryRewardYieldResponse) {
+        option (google.api.http).get = "/arbiter/stake/v1beta1/reward_yield";
+    }
+    rpc StakeInfo(QueryStakeInfoRequest) returns (QueryStakeInfoResponse) {
+        option (google.api.http).get = "/arbiter/stake/v1beta1/stake_info";
+    }
+}
+
+//=============================== Balance
+message QueryBalanceRequest {
+    string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+}
+message QueryBalanceResponse {
+    string balance = 1 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"
+    ];
+}
+
+//=============================== Staked
+message QueryStakedRequest {
+    string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+}
+message QueryStakedResponse {
+    string staked = 1 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"
+    ];
+}
+
+//=============================== TimeUntilRebase
+message QueryTimeUntilRebaseRequest {}
+message QueryTimeUntilRebaseResponse {
+    int64 blockUntilRebase = 1;
+}
+
+//=============================== RewardYield
+message QueryRewardYieldRequest {
+    string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+}
+message QueryRewardYieldResponse {
+    string rewardYield = 1 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+    ];
+}
+
+//=============================== StakeInfo
+message QueryStakeInfoRequest {
+    string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+}
+message QueryStakeInfoResponse {
+    string balance = 1 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"
+    ];
+    string staked = 2 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"
+    ];
+    int64 blockUntilRebase = 3;
+    string rewardYield = 4 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+    ];
 }

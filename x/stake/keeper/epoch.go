@@ -29,3 +29,8 @@ func (k Keeper) SetEpoch(ctx sdk.Context, epoch types.Epoch) {
 	}
 	store.Set(types.KeyEpoch, value)
 }
+
+func (k Keeper) GetBlockUntilRebase(ctx sdk.Context) int64 {
+	epoch := k.GetEpoch(ctx)
+	return epoch.EndBlock - ctx.BlockHeight()
+}

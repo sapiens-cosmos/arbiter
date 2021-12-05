@@ -161,10 +161,20 @@ func (k Keeper) Claim(ctx sdk.Context, address string, amount sdk.Int) error {
 	return nil
 }
 
+func (k Keeper) GetBalance(ctx sdk.Context, address sdk.AccAddress) sdk.Int {
+	return k.bankKeeper.GetBalance(ctx, address, appParams.BaseCoinUnit).Amount
+}
+
+func (k Keeper) GetRewardYield(ctx sdk.Context, address sdk.AccAddress) sdk.Dec {
+	totalStaked := k.GetModuleAccountBalance(ctx)
+	distributed := k.GetTotalReward(ctx)
+	return distributed.Quo(totalStaked.Amount.ToDec())
+}
+
 func (k Keeper) GetTotalReward(ctx sdk.Context) sdk.Dec {
 	totalSupply := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(appParams.BaseCoinUnit)
 	rewardRate := k.GetParams(ctx).RewardRate
-	return sdk.NewDecFromInt(totalSupply).Quo(rewardRate)
+	return sdk.NewDecFromInt(totalSupply).Mul(rewardRate)
 }
 
 func (k Keeper) AddTotalReserve(ctx sdk.Context, reserve sdk.Int) {
