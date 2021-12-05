@@ -17,4 +17,5 @@ type BankKeeper interface {
 
 type TreasuryKeeper interface {
 	AddTotalReserve(ctx sdk.Context, reserve sdk.Int)
+	GetTotalReserve(ctx sdk.Context) sdk.Int
 }

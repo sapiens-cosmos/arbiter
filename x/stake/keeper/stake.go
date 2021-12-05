@@ -174,6 +174,12 @@ func (k Keeper) AddTotalReserve(ctx sdk.Context, reserve sdk.Int) {
 	k.SetStakeState(ctx, stakeState)
 }
 
+func (k Keeper) GetTotalReserve(ctx sdk.Context) sdk.Int {
+	stakeState := k.GetStakeState(ctx)
+
+	return stakeState.TotalReserve
+}
+
 func (k Keeper) GetStakeState(ctx sdk.Context) types.StakeState {
 	stakeState := types.StakeState{}
 	store := ctx.KVStore(k.storeKey)
