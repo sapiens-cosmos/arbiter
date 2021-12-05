@@ -8,11 +8,6 @@ import (
 
 // BondIn bonds the amount of coin to receive the base coin.
 func (k Keeper) BondIn(ctx sdk.Context, bonder sdk.AccAddress, coin sdk.Coin) error {
-	policy, err := k.GetBondPolicy(ctx, coin.Denom)
-	if err != nil {
-		return err
-	}
-
 	premium, err := k.GetPremium(ctx, coin.Denom)
 	if err != nil {
 		return err
@@ -24,39 +19,44 @@ func (k Keeper) BondIn(ctx sdk.Context, bonder sdk.AccAddress, coin sdk.Coin) er
 	}
 
 	// Executing Price = RiskFreePrice * Premium {Premium ≥ 1}
-	executingPrice := riskFreePrice.ToDec().Mul(premium).TruncateInt()
+	executingPrice := riskFreePrice.Mul(premium)
 
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, bonder, types.ModuleName, sdk.NewCoins(coin))
 	if err != nil {
 		return err
 	}
 
-	newDebtAmount := coin.Amount.Quo(executingPrice)
+	debtAmount := coin.Amount.ToDec().Quo(executingPrice).TruncateInt()
 
-	err = k.inflateTotalDebt(ctx, coin.Denom, newDebtAmount)
+	err = k.inflateTotalDebt(ctx, coin.Denom, debtAmount)
 	if err != nil {
 		return err
 	}
 
 	// Mint the base coin
-	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(k.GetBaseDenom(ctx), newDebtAmount)))
+	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(k.GetBaseDenom(ctx), debtAmount)))
 	if err != nil {
 		return err
 	}
 
-	bond := types.Debt{
-		Amount:          newDebtAmount,
-		RemainingHeight: policy.VestingHeight,
-		LastHeight:      ctx.BlockHeight(),
-	}
-
-	err = k.setDebt(ctx, bond, bonder)
+	err = k.AddDebt(ctx, bonder, coin.Denom, debtAmount)
 	if err != nil {
 		return err
 	}
 
-	// profit := newDebtAmount.Mul(executingPrice.Sub(riskFreePrice))
-	panic("add logic to distribute profit to the stakers")
+	profit := debtAmount.ToDec().Mul(executingPrice.Sub(riskFreePrice)).TruncateInt()
+	// Mint the profit and move the profit to the treasury
+	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(k.GetBaseDenom(ctx), profit)))
+	if err != nil {
+		return err
+	}
+	err = k.bankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, k.treasuryModuleName, sdk.NewCoins(sdk.NewCoin(k.GetBaseDenom(ctx), profit)))
+	if err != nil {
+		return err
+	}
+	k.treasuryKeeper.AddTotalReserve(ctx, profit)
+
+	return nil
 }
 
 // GetPremium returns the premium to calculate the executing price.
@@ -75,16 +75,16 @@ func (k Keeper) GetPremium(ctx sdk.Context, bondDenom string) (sdk.Dec, error) {
 	return sdk.NewDec(1).Add(debtRatio.Mul(policy.ControlVariable)), nil
 }
 
-func (k Keeper) GetRiskFreePrice(ctx sdk.Context, bondDenom string) (sdk.Int, error) {
+func (k Keeper) GetRiskFreePrice(ctx sdk.Context, bondDenom string) (sdk.Dec, error) {
 	policy, err := k.GetBondPolicy(ctx, bondDenom)
 	if err != nil {
-		return sdk.Int{}, err
+		return sdk.Dec{}, err
 	}
 
 	switch policy.BondType {
 	case types.BondType_RESERVE:
 		// If the bond type is reverse, just use the constant 1.
-		return sdk.NewInt(1), nil
+		return sdk.NewDec(1), nil
 	case types.BondType_LIQUIDITY:
 		panic("TODO: risk free price for the liquidity not yet implemented")
 	default:

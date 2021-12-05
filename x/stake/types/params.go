@@ -4,14 +4,13 @@ import (
 	"gopkg.in/yaml.v2"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 var (
 	KeyRewardRate = []byte("RewardRate")
 )
-
-var _ paramtypes.ParamSet = (*Params)(nil)
 
 // ParamTable for staking module
 func ParamKeyTable() paramtypes.KeyTable {
@@ -29,7 +28,9 @@ func NewParams(rewardRate sdk.Dec) Params {
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		// TODO: Add validate fn.
-		paramtypes.NewParamSetPair(KeyRewardRate, &p.RewardRate, nil),
+		paramtypes.NewParamSetPair(KeyRewardRate, &p.RewardRate, func(value interface{}) error {
+			return nil
+		}),
 	}
 }
 

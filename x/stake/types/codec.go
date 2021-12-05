@@ -12,12 +12,14 @@ import (
 // Amino JSON serialization.
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgJoinStake{}, "arbiter/stake/join-stake", nil)
+	cdc.RegisterConcrete(&MsgClaim{}, "arbiter/stake/claim", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&MsgJoinStake{},
+		&MsgClaim{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

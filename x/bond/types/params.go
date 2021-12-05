@@ -30,7 +30,9 @@ func NewParams(policies []BondPolicy) Params {
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		// TODO: Add validate fn.
-		paramtypes.NewParamSetPair(KeyPolicies, &p.Policies, nil),
+		paramtypes.NewParamSetPair(KeyPolicies, &p.Policies, func(value interface{}) error {
+			return nil
+		}),
 	}
 }
 

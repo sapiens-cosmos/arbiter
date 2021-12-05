@@ -6,6 +6,22 @@ import (
 	"github.com/sapiens-cosmos/arbiter/x/bond/types"
 )
 
+func (k Keeper) RedeeambleDebt(ctx sdk.Context, bonder sdk.AccAddress) (sdk.Coin, error) {
+	debt, err := k.GetDebt(ctx, bonder)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	heightSince := ctx.BlockHeight() - debt.LastHeight
+	vestedRatio := heightSince / debt.RemainingHeight
+
+	if vestedRatio >= 0 {
+		return sdk.NewCoin(k.GetBaseDenom(ctx), debt.Amount), nil
+	}
+	payoutAmount := debt.Amount.ToDec().MulInt64(vestedRatio).TruncateInt()
+	return sdk.NewCoin(k.GetBaseDenom(ctx), payoutAmount), nil
+}
+
 func (k Keeper) RedeemDebt(ctx sdk.Context, bonder sdk.AccAddress) error {
 	debt, err := k.GetDebt(ctx, bonder)
 	if err != nil {
@@ -21,24 +37,50 @@ func (k Keeper) RedeemDebt(ctx sdk.Context, bonder sdk.AccAddress) error {
 		return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, bonder, sdk.NewCoins(
 			sdk.NewCoin(k.GetBaseDenom(ctx), debt.Amount),
 		))
-	} else {
-		payoutAmount := debt.Amount.ToDec().MulInt64(vestedRatio).TruncateInt()
+	}
+	payoutAmount := debt.Amount.ToDec().MulInt64(vestedRatio).TruncateInt()
 
-		newDebt := types.Debt{
-			Amount:          debt.Amount.Sub(payoutAmount),
-			RemainingHeight: debt.RemainingHeight - (ctx.BlockHeight() - debt.LastHeight),
-			LastHeight:      ctx.BlockHeight(),
-		}
+	newDebt := types.Debt{
+		Amount:          debt.Amount.Sub(payoutAmount),
+		RemainingHeight: debt.RemainingHeight - (ctx.BlockHeight() - debt.LastHeight),
+		LastHeight:      ctx.BlockHeight(),
+	}
 
-		err := k.setDebt(ctx, newDebt, bonder)
-		if err != nil {
+	err = k.setDebt(ctx, newDebt, bonder)
+	if err != nil {
+		return err
+	}
+
+	return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, bonder, sdk.NewCoins(
+		sdk.NewCoin(k.GetBaseDenom(ctx), payoutAmount),
+	))
+}
+
+func (k Keeper) AddDebt(ctx sdk.Context, bonder sdk.AccAddress, bondDenom string, amount sdk.Int) error {
+	policy, err := k.GetBondPolicy(ctx, bondDenom)
+	if err != nil {
+		return err
+	}
+
+	debt, err := k.GetDebt(ctx, bonder)
+	if err != nil {
+		sdkErr, ok := err.(sdkerrors.Error)
+		if ok && sdkErr.Is(types.ErrNoDebt) {
+			debt = types.Debt{
+				Amount: sdk.NewInt(0),
+			}
+		} else {
 			return err
 		}
-
-		return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, bonder, sdk.NewCoins(
-			sdk.NewCoin(k.GetBaseDenom(ctx), payoutAmount),
-		))
 	}
+
+	debt = types.Debt{
+		Amount:          debt.Amount.Add(amount),
+		RemainingHeight: policy.VestingHeight,
+		LastHeight:      ctx.BlockHeight(),
+	}
+
+	return k.setDebt(ctx, debt, bonder)
 }
 
 func (k Keeper) GetDebt(ctx sdk.Context, bonder sdk.AccAddress) (types.Debt, error) {

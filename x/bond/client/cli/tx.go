@@ -14,14 +14,15 @@ import (
 // GetTxCmd returns a root CLI command handler for all x/bond transaction commands.
 func GetTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{
-		Use: types.ModuleName,
-		Short: "Bond transaction subcommands",
-		DisableFlagParsing: true,
+		Use:                        types.ModuleName,
+		Short:                      "Bond transaction subcommands",
+		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
-		RunE: client.ValidateCmd,
+		RunE:                       client.ValidateCmd,
 	}
 
-	txCmd.AddCommand()
+	txCmd.AddCommand(NewBondInCmd())
+	txCmd.AddCommand(NewRedeemCmd())
 
 	return txCmd
 }
@@ -34,7 +35,10 @@ func NewBondInCmd() *cobra.Command {
 ignored as it is implied from [from_key_or_address].`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cmd.Flags().Set(flags.FlagFrom, args[0])
+			err := cmd.Flags().Set(flags.FlagFrom, args[0])
+			if err != nil {
+				panic(err)
+			}
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -46,6 +50,37 @@ ignored as it is implied from [from_key_or_address].`,
 			}
 
 			msg := types.NewMsgBondIn(clientCtx.GetFromAddress(), coin)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// NewRedeemCmd returns a CLI command handler for creating a MsgRedeem transaction.
+func NewRedeemCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use: "redeem [from_key_or_address]",
+		Short: `Redeem debt from bond. Note, the'--from' flag is
+ignored as it is implied from [from_key_or_address].`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			err := cmd.Flags().Set(flags.FlagFrom, args[0])
+			if err != nil {
+				panic(err)
+			}
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgRedeem(clientCtx.GetFromAddress())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

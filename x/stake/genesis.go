@@ -7,11 +7,18 @@ import (
 )
 
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	k.SetEpoch(ctx, genState.Epoch)
+	initTokens := sdk.NewCoins(genState.ModuleAccountBalance, genState.ModuleAccountSTokenBalance)
+	err := k.CreateModuleAccount(ctx, initTokens)
+	if err != nil {
+		panic(err)
+	}
+	k.SetStakeState(ctx, genState.StakeState)
 }
 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
-	genesis.Epoch = k.GetEpoch(ctx)
+	genesis.StakeState = k.GetStakeState(ctx)
+	genesis.ModuleAccountBalance = k.GetModuleAccountBalance(ctx)
+	genesis.ModuleAccountSTokenBalance = k.GetModuleAccountSTokenBalance(ctx)
 	return genesis
 }

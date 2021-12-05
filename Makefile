@@ -188,6 +188,10 @@ proto-gen:
 	@echo "Generating Protobuf files"
 	@sh dev/proto/protogen-docker.sh
 
+proto-swagger-gen:
+	@echo "Generating Protobuf Swagger"
+	@sh dev/proto/protogen-swagger-doc-docker.sh
+
 .PHONY: all build-linux install format lint \
 	clean build \
 	test test-all test-build test-cover test-unit test-race \

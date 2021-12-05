@@ -10,23 +10,29 @@ import (
 
 // keeper of the stake store
 type Keeper struct {
-	storeKey   sdk.StoreKey
-	cdc        codec.BinaryMarshaler
-	bankKeeper types.BankKeeper
-	paramstore paramtypes.Subspace
+	storeKey sdk.StoreKey
+	cdc      codec.BinaryMarshaler
+
+	paramSpace paramtypes.Subspace
+
+	accountKeeper types.AccountKeeper
+	bankKeeper    types.BankKeeper
+	paramstore    paramtypes.Subspace
 }
 
 // NewKeeper creates a new stake Keeper instance
-func NewKeeper(cdc codec.BinaryMarshaler, key sdk.StoreKey, bk types.BankKeeper, ps paramtypes.Subspace) Keeper {
+func NewKeeper(cdc codec.BinaryMarshaler, paramSpace paramtypes.Subspace, key sdk.StoreKey, ak types.AccountKeeper, bk types.BankKeeper, ps paramtypes.Subspace) Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
 		ps = ps.WithKeyTable(types.ParamKeyTable())
 	}
 
 	return Keeper{
-		storeKey:   key,
-		cdc:        cdc,
-		bankKeeper: bk,
-		paramstore: ps,
+		storeKey:      key,
+		cdc:           cdc,
+		paramSpace:    paramSpace,
+		accountKeeper: ak,
+		bankKeeper:    bk,
+		paramstore:    ps,
 	}
 }
