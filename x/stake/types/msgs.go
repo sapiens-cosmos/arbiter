@@ -34,3 +34,26 @@ func (m MsgJoinStake) GetSigners() []sdk.AccAddress {
 	owner, _ := sdk.AccAddressFromBech32(m.Sender)
 	return []sdk.AccAddress{owner}
 }
+
+func NewMsgClaim(owner sdk.AccAddress, tokenIn sdk.Int) *MsgClaim {
+	return &MsgClaim{
+		Sender:  owner.String(),
+		TokenIn: tokenIn,
+	}
+}
+
+func (m MsgClaim) Route() string { return RouterKey }
+func (m MsgClaim) Type() string  { return TypeMsgJoinStake }
+func (m MsgClaim) ValidateBasic() error {
+	if m.Sender == "" {
+		return errors.New("owner should be set")
+	}
+	return nil
+}
+func (m MsgClaim) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
+}
+func (m MsgClaim) GetSigners() []sdk.AccAddress {
+	owner, _ := sdk.AccAddressFromBech32(m.Sender)
+	return []sdk.AccAddress{owner}
+}
