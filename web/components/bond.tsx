@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { GrClose } from "react-icons/gr";
+import useSWR from "swr";
+import { fetcher } from "utils/api";
 
 function BondModal({ closeModal }: { closeModal: () => void }) {
   const [mode, setMode] = useState<"Bond" | "Redeem">("Bond");
+  const { data, error } = useSWR(
+    "/arbiter/bond/v1beta1/bond_info/ugreen",
+    fetcher
+  );
 
   return (
     <div
@@ -28,11 +34,13 @@ function BondModal({ closeModal }: { closeModal: () => void }) {
         <div className="w-full mb-4 flex justify-around">
           <div className="flex flex-col items-center">
             <div className="text-lg">Bond Price(1 ARB)</div>
-            <div className="text-xl">95 GREEN</div>
+            <div className="text-xl">
+              {parseFloat(parseFloat(data.executing_price).toFixed(2))} GREEN
+            </div>
           </div>
           <div className="flex flex-col items-center">
             <div className="text-lg">Market Price(1 ARB)</div>
-            <div className="text-xl">100 GREEN</div>
+            <div className="text-xl">2 GREEN</div>
           </div>
         </div>
 
@@ -120,6 +128,11 @@ export default function Bond() {
   const openModal = () => setIsOpenModal(true);
   const closeModal = () => setIsOpenModal(false);
 
+  const { data, error } = useSWR(
+    "/arbiter/bond/v1beta1/bond_info/ugreen",
+    fetcher
+  );
+
   return (
     <div className="w-full h-full rounded-xl bg-secondary pt-8 pb-12 px-16 flex flex-col items-center">
       {isOpenModal && <BondModal closeModal={closeModal} />}
@@ -132,7 +145,7 @@ export default function Bond() {
         </div>
         <div className="flex flex-col items-center">
           <div className="text-xl">ARB Price</div>
-          <div className="text-xl">100 GREEN ($1,000) </div>
+          <div className="text-xl">2 GREEN ($20) </div>
         </div>
       </div>
 
@@ -142,7 +155,12 @@ export default function Bond() {
           onClick={openModal}
         >
           <div className="text-xl">GREEN (eco-credit)</div>
-          <div className="text-xl">5% D/C</div>
+          <div className="text-xl">
+            {parseFloat(
+              parseFloat(`${parseFloat(data.executing_price) * 50}`).toFixed(2)
+            )}
+            % D/C
+          </div>
         </div>
       </div>
     </div>
