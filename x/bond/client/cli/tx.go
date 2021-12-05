@@ -14,14 +14,14 @@ import (
 // GetTxCmd returns a root CLI command handler for all x/bond transaction commands.
 func GetTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{
-		Use: types.ModuleName,
-		Short: "Bond transaction subcommands",
-		DisableFlagParsing: true,
+		Use:                        types.ModuleName,
+		Short:                      "Bond transaction subcommands",
+		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
-		RunE: client.ValidateCmd,
+		RunE:                       client.ValidateCmd,
 	}
 
-	txCmd.AddCommand()
+	txCmd.AddCommand(NewBondInCmd())
 
 	return txCmd
 }
@@ -34,7 +34,10 @@ func NewBondInCmd() *cobra.Command {
 ignored as it is implied from [from_key_or_address].`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cmd.Flags().Set(flags.FlagFrom, args[0])
+			err := cmd.Flags().Set(flags.FlagFrom, args[0])
+			if err != nil {
+				panic(err)
+			}
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
