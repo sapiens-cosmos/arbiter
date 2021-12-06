@@ -8,9 +8,11 @@ import (
 
 const (
 	TypeMsgJoinStake = "stake"
+	TypeMsgClaim     = "claim"
 )
 
 var _ sdk.Msg = &MsgJoinStake{}
+var _ sdk.Msg = &MsgClaim{}
 
 func NewMsgJoinStake(owner sdk.AccAddress, tokenIn sdk.Coin) *MsgJoinStake {
 	return &MsgJoinStake{
@@ -43,7 +45,7 @@ func NewMsgClaim(owner sdk.AccAddress, tokenIn sdk.Int) *MsgClaim {
 }
 
 func (m MsgClaim) Route() string { return RouterKey }
-func (m MsgClaim) Type() string  { return TypeMsgJoinStake }
+func (m MsgClaim) Type() string  { return TypeMsgClaim }
 func (m MsgClaim) ValidateBasic() error {
 	if m.Sender == "" {
 		return errors.New("owner should be set")

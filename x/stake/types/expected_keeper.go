@@ -9,6 +9,7 @@ import (
 // AccountKeeper defines the expected account keeper used for simulations (noalias)
 type AccountKeeper interface {
 	GetModuleAddress(name string) sdk.AccAddress
+	GetModuleAddressAndPermissions(moduleName string) (addr sdk.AccAddress, permissions []string)
 	SetModuleAccount(ctx sdk.Context, macc types.ModuleAccountI)
 }
 

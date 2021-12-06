@@ -71,7 +71,7 @@ func NewClaimCommand() *cobra.Command {
 
 			txf := tx.NewFactoryCLI(clientCtx, cmd.Flags()).WithTxConfig(clientCtx.TxConfig).WithAccountRetriever(clientCtx.AccountRetriever)
 
-			claimAmount, ok := sdk.NewIntFromString(args[1])
+			claimAmount, ok := sdk.NewIntFromString(args[0])
 			if !ok {
 				return fmt.Errorf("invalid claim amount")
 			}

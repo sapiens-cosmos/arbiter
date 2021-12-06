@@ -24,9 +24,11 @@ func (k Keeper) JoinStake(ctx sdk.Context, address string, tokenIn sdk.Coin) err
 		return err
 	}
 	sTokens := sdk.NewCoin(appParams.BaseStakeCoinUnit, tokenIn.Amount)
-	ctx.Logger().Info("STOKENS INPUT")
-	ctx.Logger().Info(sTokens.Amount.String())
 	err = k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.Coins{sTokens})
+	if err != nil {
+		return err
+	}
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, accAddress, sdk.Coins{sTokens})
 	if err != nil {
 		return err
 	}
@@ -38,8 +40,6 @@ func (k Keeper) JoinStake(ctx sdk.Context, address string, tokenIn sdk.Coin) err
 				Owner: address,
 				Coin:  sTokens,
 			}
-			ctx.Logger().Info("LOCK FROM INITAL")
-			ctx.Logger().Info(lock.Coin.Amount.String())
 
 			k.SetLockByAddress(ctx, lock)
 			return nil
