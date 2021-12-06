@@ -15,12 +15,12 @@ func (k Keeper) RedeeambleDebt(ctx sdk.Context, bonder sdk.AccAddress) (sdk.Coin
 	}
 
 	heightSince := ctx.BlockHeight() - debt.LastHeight
-	vestedRatio := heightSince / debt.RemainingHeight
+	vestedRatio := sdk.NewDec(heightSince).QuoInt64(debt.RemainingHeight)
 
-	if vestedRatio >= 0 {
+	if vestedRatio.GTE(sdk.NewDec(1)) {
 		return sdk.NewCoin(k.GetBaseDenom(ctx), debt.Amount), nil
 	}
-	payoutAmount := debt.Amount.ToDec().MulInt64(vestedRatio).TruncateInt()
+	payoutAmount := debt.Amount.ToDec().Mul(vestedRatio).TruncateInt()
 	return sdk.NewCoin(k.GetBaseDenom(ctx), payoutAmount), nil
 }
 
@@ -31,16 +31,16 @@ func (k Keeper) RedeemDebt(ctx sdk.Context, bonder sdk.AccAddress) error {
 	}
 
 	heightSince := ctx.BlockHeight() - debt.LastHeight
-	vestedRatio := heightSince / debt.RemainingHeight
+	vestedRatio := sdk.NewDec(heightSince).QuoInt64(debt.RemainingHeight)
 
-	if vestedRatio >= 0 {
+	if vestedRatio.GTE(sdk.NewDec(1)) {
 		k.deleteDebt(ctx, bonder)
 
 		return k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, bonder, sdk.NewCoins(
 			sdk.NewCoin(k.GetBaseDenom(ctx), debt.Amount),
 		))
 	}
-	payoutAmount := debt.Amount.ToDec().MulInt64(vestedRatio).TruncateInt()
+	payoutAmount := debt.Amount.ToDec().Mul(vestedRatio).TruncateInt()
 
 	newDebt := types.Debt{
 		Amount:          debt.Amount.Sub(payoutAmount),
