@@ -52,7 +52,7 @@ const Home: NextPage = () => {
       connectWallet();
     }
     geyKeySetAccountInfo();
-  }, [keplr, bech32Address]);
+  }, [keplr]);
 
   return (
     <>
@@ -69,7 +69,7 @@ const Home: NextPage = () => {
       />
       <main className="pt-24 pb-10 max-w-default w-full mx-auto">
         <div className="mb-12">
-          <Bond />
+          <Bond keplr={keplr} bech32Address={bech32Address} />
         </div>
 
         <Stake keplr={keplr} bech32Address={bech32Address} />
