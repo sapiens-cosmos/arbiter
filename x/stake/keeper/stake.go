@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/gogo/protobuf/proto"
 	appParams "github.com/sapiens-cosmos/arbiter/app/params"
 	"github.com/sapiens-cosmos/arbiter/x/stake/types"
