@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"errors"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -31,8 +32,7 @@ func (k Keeper) JoinStake(ctx sdk.Context, address string, tokenIn sdk.Coin) err
 
 	lock, err := k.GetLockByAddress(ctx, address)
 	if err != nil {
-		sdkErr, ok := err.(sdkerrors.Error)
-		if ok && sdkErr.Is(types.ErrNoLock) {
+		if errors.Is(err, types.ErrNoLock) {
 			lock = types.Lock{
 				Owner: address,
 				Coin:  sTokens,

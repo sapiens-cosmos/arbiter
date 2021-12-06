@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"errors"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/sapiens-cosmos/arbiter/x/bond/types"
@@ -64,8 +66,7 @@ func (k Keeper) AddDebt(ctx sdk.Context, bonder sdk.AccAddress, bondDenom string
 
 	debt, err := k.GetDebt(ctx, bonder)
 	if err != nil {
-		sdkErr, ok := err.(sdkerrors.Error)
-		if ok && sdkErr.Is(types.ErrNoDebt) {
+		if errors.Is(err, types.ErrNoDebt) {
 			debt = types.Debt{
 				Amount: sdk.NewInt(0),
 			}
