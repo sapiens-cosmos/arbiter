@@ -167,7 +167,11 @@ func (k Keeper) GetBalance(ctx sdk.Context, address sdk.AccAddress) sdk.Int {
 func (k Keeper) GetRewardYield(ctx sdk.Context) sdk.Dec {
 	totalStaked := k.GetModuleAccountBalance(ctx)
 	distributed := k.GetTotalReward(ctx)
-	return distributed.Quo(totalStaked.Amount.ToDec())
+	if totalStaked.Amount.Equal(sdk.ZeroInt()) || distributed.Equal(sdk.ZeroDec()) {
+		return sdk.ZeroDec()
+	}
+	rewardYield := distributed.Quo(totalStaked.Amount.ToDec())
+	return rewardYield
 }
 
 func (k Keeper) GetTotalReward(ctx sdk.Context) sdk.Dec {
