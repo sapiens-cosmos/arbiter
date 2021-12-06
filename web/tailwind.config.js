@@ -7,6 +7,7 @@ module.exports = {
       secondary: "#80ED99",
       white: "#ffffff",
       black: "rgba(0, 0, 0, 0.85)",
+      gray: "#A7BBC7",
     },
     backgroundColor: (themes) => ({
       ...themes("colors"),

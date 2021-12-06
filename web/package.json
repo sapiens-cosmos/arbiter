@@ -10,8 +10,10 @@
     "localnet:stop": "docker rm --force arbiter_localnet"
   },
   "dependencies": {
+    "@cosmjs/launchpad": "^0.26.5",
     "@keplr-wallet/cosmos": "^0.9.9",
     "@keplr-wallet/stores": "^0.9.9",
+    "@keplr-wallet/unit": "^0.9.9",
     "next": "12.0.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",

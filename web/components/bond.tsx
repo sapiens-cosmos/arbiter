@@ -2,6 +2,7 @@ import { useState } from "react";
 import { GrClose } from "react-icons/gr";
 import useSWR from "swr";
 import { fetcher } from "utils/api";
+import InfoPlaceholder from "components/infoPlaceholder";
 
 function BondModal({ closeModal }: { closeModal: () => void }) {
   const [mode, setMode] = useState<"Bond" | "Redeem">("Bond");
@@ -34,9 +35,13 @@ function BondModal({ closeModal }: { closeModal: () => void }) {
         <div className="w-full mb-4 flex justify-around">
           <div className="flex flex-col items-center">
             <div className="text-lg">Bond Price(1 ARB)</div>
-            <div className="text-xl">
-              {parseFloat(parseFloat(data.executing_price).toFixed(2))} GREEN
-            </div>
+            {data ? (
+              <div className="text-xl">
+                {parseFloat(parseFloat(data.executing_price).toFixed(2))} GREEN
+              </div>
+            ) : (
+              <InfoPlaceholder className="w-24 h-5 mt-1" />
+            )}
           </div>
           <div className="flex flex-col items-center">
             <div className="text-lg">Market Price(1 ARB)</div>
@@ -155,12 +160,18 @@ export default function Bond() {
           onClick={openModal}
         >
           <div className="text-xl">GREEN (eco-credit)</div>
-          <div className="text-xl">
-            {parseFloat(
-              parseFloat(`${parseFloat(data.executing_price) * 50}`).toFixed(2)
-            )}
-            % D/C
-          </div>
+          {data ? (
+            <div className="text-xl">
+              {parseFloat(
+                parseFloat(`${parseFloat(data.executing_price) * 50}`).toFixed(
+                  2
+                )
+              )}
+              % D/C
+            </div>
+          ) : (
+            <InfoPlaceholder className="w-24 h-6" />
+          )}
         </div>
       </div>
     </div>
