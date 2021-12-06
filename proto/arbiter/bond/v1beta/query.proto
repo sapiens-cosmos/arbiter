@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "arbiter/bond/v1beta/params.proto";
+import "arbiter/bond/v1beta/bond.proto";
 
 option go_package = "github.com/sapiens-cosmos/arbiter/x/bond/types";
 
@@ -24,6 +25,10 @@ service Query {
 
   rpc BondInfo(QueryBondInfoRequest) returns (QueryBondInfoResponse) {
     option (google.api.http).get =  "/arbiter/bond/v1beta1/bond_info/{bond_denom}";
+  }
+
+  rpc Debt(QueryDebtRequest) returns (QueryDebtResponse) {
+    option (google.api.http).get =  "/arbiter/bond/v1beta1/debt/{bonder}";
   }
 
   rpc Params(QueryParamsRequest) returns(QueryParamsResponse) {
@@ -85,6 +90,19 @@ message QueryBondInfoResponse {
   ];
   string executing_price = 3 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
+  ];
+}
+
+message QueryDebtRequest {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string bonder = 1;
+}
+
+message QueryDebtResponse {
+  Debt debt = 1 [
+    (gogoproto.moretags) = "yaml:\"debt\""
   ];
 }
 
