@@ -40,7 +40,7 @@ func NewStakeCmd() *cobra.Command {
 				return err
 			}
 
-			stakeAmount, err := sdk.ParseCoinNormalized(args[1])
+			stakeAmount, err := sdk.ParseCoinNormalized(args[0])
 			if err != nil {
 				return err
 			}

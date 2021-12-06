@@ -28,6 +28,8 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		GetCmdTimeUnitlRebase(),
 		GetCmdRewardYield(),
 		GetCmdStakeInfo(),
+		GetCmdTotalReserve(),
+		GetCmdQueryParams(),
 	)
 
 	return cmd
@@ -195,6 +197,76 @@ $ %s query stake stake-info <address>
 			queryClient := types.NewQueryClient(clientCtx)
 
 			res, err := queryClient.StakeInfo(cmd.Context(), &types.QueryStakeInfoRequest{Sender: args[0]})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func GetCmdTotalReserve() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "total-reserve",
+		Short: "Returns total reserve for stake module treasury",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query total reserve.
+
+Example:
+$ %s query stake total-reserve
+`,
+				version.AppName,
+			),
+		),
+		Args: cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.TotalReserve(cmd.Context(), &types.QueryTotalReserveRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func GetCmdQueryParams() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "params",
+		Short: "Query current params for stake module",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query params for stake module.
+
+Example:
+$ %s query stake params
+`,
+				version.AppName,
+			),
+		),
+		Args: cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.Params(cmd.Context(), &types.QueryParamsRequest{})
 			if err != nil {
 				return err
 			}
