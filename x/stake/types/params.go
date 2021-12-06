@@ -12,6 +12,8 @@ var (
 	KeyRewardRate = []byte("RewardRate")
 )
 
+var _ paramtypes.ParamSet = (*Params)(nil)
+
 // ParamTable for staking module
 func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})

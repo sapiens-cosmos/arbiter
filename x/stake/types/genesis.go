@@ -14,7 +14,7 @@ func DefaultGenesis() *GenesisState {
 			Epoch: Epoch{
 				EndBlock:   0,
 				Number:     0,
-				Length:     62_000,
+				Length:     62000,
 				Distribute: 0,
 			},
 			TotalReserve: sdk.ZeroInt(),
@@ -22,6 +22,7 @@ func DefaultGenesis() *GenesisState {
 		ModuleAccountBalance: sdk.NewCoin(appParams.BaseCoinUnit, sdk.ZeroInt()),
 		// sToken Balance starts with 1sToken to avoid zero exception
 		ModuleAccountSTokenBalance: sdk.NewCoin(appParams.BaseStakeCoinUnit, sdk.NewInt(1_000_000)),
+		Params:                     DefaultParams(),
 	}
 }
 

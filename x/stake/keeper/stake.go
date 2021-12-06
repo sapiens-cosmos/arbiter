@@ -48,12 +48,13 @@ func (k Keeper) JoinStake(ctx sdk.Context, address string, tokenIn sdk.Coin) err
 }
 
 func (k Keeper) Rebase(ctx sdk.Context) error {
-	epoch := k.GetEpoch(ctx)
-	if epoch.EndBlock < ctx.BlockHeight() {
-		k.RebaseToken(ctx, epoch.Distribute, epoch.Number)
+	stakeState := k.GetStakeState(ctx)
 
-		epoch.EndBlock += epoch.Length
-		epoch.Number++
+	if stakeState.Epoch.EndBlock < ctx.BlockHeight() {
+		k.RebaseToken(ctx, stakeState.Epoch.Distribute, stakeState.Epoch.Number)
+
+		stakeState.Epoch.EndBlock += stakeState.Epoch.Length
+		stakeState.Epoch.Number++
 
 		err := k.Distribute(ctx)
 		if err != nil {
@@ -64,12 +65,11 @@ func (k Keeper) Rebase(ctx sdk.Context) error {
 		staked := k.CirculatingSupply(ctx)
 
 		if moduleAccountBalance.Amount.LTE(staked) {
-			epoch.Distribute = 0
+			stakeState.Epoch.Distribute = 0
 		} else {
-			epoch.Distribute = moduleAccountBalance.Amount.Sub(staked).Int64()
+			stakeState.Epoch.Distribute = moduleAccountBalance.Amount.Sub(staked).Int64()
 		}
-
-		k.SetEpoch(ctx, epoch)
+		k.SetStakeState(ctx, stakeState)
 	}
 	return nil
 }
@@ -174,6 +174,11 @@ func (k Keeper) GetTotalReward(ctx sdk.Context) sdk.Dec {
 	totalSupply := k.bankKeeper.GetSupply(ctx).GetTotal().AmountOf(appParams.BaseCoinUnit)
 	rewardRate := k.GetParams(ctx).RewardRate
 	return sdk.NewDecFromInt(totalSupply).Mul(rewardRate)
+}
+
+func (k Keeper) GetBlockUntilRebase(ctx sdk.Context) int64 {
+	epoch := k.GetStakeState(ctx).Epoch
+	return epoch.EndBlock - ctx.BlockHeight()
 }
 
 func (k Keeper) AddTotalReserve(ctx sdk.Context, reserve sdk.Int) {

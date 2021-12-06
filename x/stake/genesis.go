@@ -13,6 +13,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		panic(err)
 	}
 	k.SetStakeState(ctx, genState.StakeState)
+	k.SetParams(ctx, genState.Params)
 }
 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
