@@ -45,7 +45,7 @@ RUN echo "health nest provide snow total tissue intact loyal cargo must credit w
 RUN echo "canyon stone next tenant trial ugly slim luggage ski govern outside comfort" | ./arbiterd keys add local2 --recover --keyring-backend test
 RUN echo "travel renew first fiction trick fly disease advance hunt famous absurd region" | ./arbiterd keys add local3 --recover --keyring-backend test
 
-RUN ./arbiterd add-genesis-account $(./arbiterd keys show val -a --keyring-backend test) 1000000uarb,100000000000ugreen
+RUN ./arbiterd add-genesis-account $(./arbiterd keys show val -a --keyring-backend test) 2000000uarb,100000000000ugreen
 RUN ./arbiterd add-genesis-account $(./arbiterd keys show local1 -a --keyring-backend test) 100000uarb,100000000000ugreen
 RUN ./arbiterd add-genesis-account $(./arbiterd keys show local2 -a --keyring-backend test) 100000uarb,100000000000ugreen
 RUN ./arbiterd add-genesis-account $(./arbiterd keys show local3 -a --keyring-backend test) 100000uarb,100000000000ugreen
