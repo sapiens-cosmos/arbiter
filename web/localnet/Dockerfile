@@ -27,6 +27,7 @@ RUN yq eval '.app_state.bond.params.policies[0].bond_denom = "ugreen"' ~/.arbite
     | yq eval '.app_state.bond.params.policies[0].vesting_height = "40"' - \
     | yq eval '.app_state.bond.params.policies[0].control_variable = "50"' - \
     | yq eval '.app_state.stake.stake_state.epoch.length = "40"' - \
+    | yq eval '.app_state.stake.params.reward_rate = "0.003058"' - \
     | yq eval '.app_state.staking.params.bond_denom = "uarb"' - \
     | yq eval '.app_state.crisis.constant_fee.denom = "uarb"' - \
     | yq eval '' -j - \
