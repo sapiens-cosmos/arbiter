@@ -34,22 +34,6 @@ export default function Stake({
     `/arbiter/stake/v1beta1/stake_info/${bech32Address}`,
     fetcher
   );
-  const unstakedBalance = arbiterStakeData
-    ? arbiterStakeData.balance
-      ? toPrettyCoin(arbiterStakeData.balance, "uarb")
-          .trim(true)
-          .hideDenom(true)
-          .toString()
-      : "0"
-    : null;
-  const stakedBalance = arbiterStakeData
-    ? arbiterStakeData.staked
-      ? toPrettyCoin(arbiterStakeData.staked, "uarb")
-          .trim(true)
-          .hideDenom(true)
-          .toString()
-      : "0"
-    : null;
 
   const stakeOrUnstake = async () => {
     if (!keplr) {
@@ -163,7 +147,36 @@ export default function Stake({
     );
   };
 
-  console.log(arbiterStakeData);
+  const unstakedBalance = arbiterStakeData
+    ? arbiterStakeData.balance
+      ? toPrettyCoin(arbiterStakeData.balance, "uarb")
+          .trim(true)
+          .hideDenom(true)
+          .toString()
+      : "0"
+    : null;
+  const stakedBalance = arbiterStakeData
+    ? arbiterStakeData.staked
+      ? toPrettyCoin(arbiterStakeData.staked, "uarb")
+          .trim(true)
+          .hideDenom(true)
+          .toString()
+      : "0"
+    : null;
+  const totalValueStaked = arbiterStakeData
+    ? toPrettyCoin(arbiterStakeData.totalStaked || "0", "uarb")
+        .trim(true)
+        .hideDenom(true)
+    : null;
+  const apy = arbiterStakeData
+    ? parseFloat(arbiterStakeData.rewardYield) === 0
+      ? "0"
+      : parseFloat(
+          (
+            Math.pow(1 + parseFloat(arbiterStakeData.rewardYield), 1095) * 100
+          ).toFixed(2)
+        )
+    : null;
 
   return (
     <div className="w-full h-full rounded-xl bg-primary pt-8 pb-12 px-16 flex flex-col items-center">
@@ -172,11 +185,22 @@ export default function Stake({
       <div className="w-full mb-12 flex justify-around">
         <div className="flex flex-col items-center">
           <div className="text-lg">APY</div>
-          <div className="text-xl">87,929.4%</div>
+          {apy ? (
+            <div className="text-xl">{apy}%</div>
+          ) : (
+            <InfoPlaceholder className="w-20 h-5 mt-1" />
+          )}
         </div>
         <div className="flex flex-col items-center">
           <div className="text-lg">Total Value Staked</div>
-          <div className="text-xl">$23,311,222</div>
+          {totalValueStaked ? (
+            <div className="text-xl">
+              {totalValueStaked.toString()} ($
+              {totalValueStaked.mul(new Dec(10)).toString()})
+            </div>
+          ) : (
+            <InfoPlaceholder className="w-20 h-5 mt-1" />
+          )}
         </div>
       </div>
 

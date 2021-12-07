@@ -175,7 +175,9 @@ function BondModal({
           <GrClose />
         </div>
 
-        <div className="w-full mb-6 flex justify-around text-3xl">GREEN</div>
+        <div className="w-full mb-6 flex justify-around text-3xl">
+          Bond GREEN & Redeem ARB
+        </div>
 
         <div className="w-full mb-4 flex justify-around">
           <div className="flex flex-col items-center">
@@ -369,7 +371,7 @@ export default function Bond({
             <div className="text-xl">
               {parseFloat(
                 parseFloat(
-                  `${parseFloat(arbiterBondData.executing_price) * 50}`
+                  `${(2 - parseFloat(arbiterBondData.executing_price)) * 50}`
                 ).toFixed(2)
               )}
               % D/C
