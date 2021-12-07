@@ -158,10 +158,14 @@ func (k Keeper) DecayDebt(ctx sdk.Context, bondDenom string) error {
 
 	heightSince := ctx.BlockHeight() - state.LastDecayHeight
 
+	if heightSince == 0 {
+		return nil
+	}
+
 	if heightSince >= policy.VestingHeight {
 		state.TotalDebt = sdk.NewDec(0)
 	} else {
-		state.TotalDebt = state.TotalDebt.MulInt64(heightSince).QuoInt64(policy.VestingHeight)
+		state.TotalDebt = state.TotalDebt.MulInt64(policy.VestingHeight - heightSince).QuoInt64(policy.VestingHeight)
 	}
 
 	state.LastDecayHeight = ctx.BlockHeight()
