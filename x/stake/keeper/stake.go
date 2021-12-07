@@ -169,6 +169,15 @@ func (k Keeper) GetBalance(ctx sdk.Context, address sdk.AccAddress) sdk.Int {
 	return k.bankKeeper.GetBalance(ctx, address, appParams.BaseCoinUnit).Amount
 }
 
+func (k Keeper) GetTotalStaked(ctx sdk.Context) sdk.Int {
+	totalStaked := sdk.NewInt(0)
+	locks := k.GetAllLocks(ctx)
+	for _, lock := range locks {
+		totalStaked = totalStaked.Add(lock.Coin.Amount)
+	}
+	return totalStaked
+}
+
 func (k Keeper) GetRewardYield(ctx sdk.Context) sdk.Dec {
 	totalStaked := k.GetModuleAccountBalance(ctx)
 	distributed := k.GetTotalReward(ctx)

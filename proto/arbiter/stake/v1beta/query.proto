@@ -82,6 +82,9 @@ message QueryStakeInfoResponse {
     string rewardYield = 4 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec"
     ];
+    string totalStaked = 5 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"
+    ];
 }
 
 //=============================== TotalReserve

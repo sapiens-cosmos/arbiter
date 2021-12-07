@@ -110,7 +110,9 @@ func (q queryServer) StakeInfo(ctx context.Context, req *types.QueryStakeInfoReq
 	blockUntilRebase := q.keeper.GetBlockUntilRebase(sdkCtx)
 	rewardYield := q.keeper.GetRewardYield(sdkCtx)
 
-	return &types.QueryStakeInfoResponse{Balance: &balance, Staked: &staked, BlockUntilRebase: blockUntilRebase, RewardYield: &rewardYield}, nil
+	totalStaked := q.keeper.GetTotalStaked(sdkCtx)
+
+	return &types.QueryStakeInfoResponse{Balance: &balance, Staked: &staked, BlockUntilRebase: blockUntilRebase, RewardYield: &rewardYield, TotalStaked: &totalStaked}, nil
 }
 
 func (q queryServer) TotalReserve(ctx context.Context, req *types.QueryTotalReserveRequest) (*types.QueryTotalReserveResponse, error) {
