@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { fetcher } from "utils/api";
 import { toPrettyCoin } from "utils/coin";
 import InfoPlaceholder from "components/infoPlaceholder";
@@ -25,6 +25,7 @@ export default function Stake({
   const [mode, setMode] = useState<"Stake" | "Unstake">("Stake");
   const [inputValue, setInputValue] = useState("");
 
+  const { mutate } = useSWRConfig();
   const { data: accountData } = useSWR(
     `/auth/accounts/${bech32Address}`,
     fetcher
@@ -131,6 +132,11 @@ export default function Stake({
     );
 
     setInputValue("");
+    const timer = window.setTimeout(() => {
+      mutate(`/auth/accounts/${bech32Address}`);
+      mutate(`/arbiter/stake/v1beta1/stake_info/${bech32Address}`);
+      clearTimeout(timer);
+    }, 4000);
   };
 
   const setMax = () => {
@@ -156,6 +162,8 @@ export default function Stake({
             "0"
     );
   };
+
+  console.log(arbiterStakeData);
 
   return (
     <div className="w-full h-full rounded-xl bg-primary pt-8 pb-12 px-16 flex flex-col items-center">

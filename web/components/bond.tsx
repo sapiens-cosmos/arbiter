@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { GrClose } from "react-icons/gr";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { fetcher } from "utils/api";
 import InfoPlaceholder from "components/infoPlaceholder";
 import { toPrettyCoin } from "utils/coin";
@@ -43,6 +43,7 @@ function BondModal({
     `/cosmos/bank/v1beta1/balances/${bech32Address}/ugreen`,
     fetcher
   );
+  const { mutate } = useSWRConfig();
 
   const yourBalance = cosmosBankData
     ? toPrettyCoin(
@@ -66,12 +67,6 @@ function BondModal({
         .trim(true)
         .hideDenom(true)
     : null;
-  const maxYouCanBuy =
-    arbiterBondData && yourBalance
-      ? yourBalance.mul(
-          new Dec((1 / arbiterBondData.executing_price).toString() || "0")
-        )
-      : null;
   const claimableRewards = arbiterRedeemData
     ? toPrettyCoin(
         arbiterRedeemData.coin ? arbiterRedeemData.coin.amount : "0",
@@ -149,6 +144,16 @@ function BondModal({
       signedTx,
       broadCastMode as BroadcastMode
     );
+
+    setInputValue("");
+    const timer = window.setTimeout(() => {
+      mutate(`/auth/accounts/${bech32Address}`);
+      mutate("/arbiter/bond/v1beta1/bond_info/ugreen");
+      mutate(`/arbiter/bond/v1beta1/redeemable/${bech32Address}`);
+      mutate(`/cosmos/bank/v1beta1/balances/${bech32Address}/ugreen`);
+      mutate("/arbiter/stake/v1beta1/total_reserve");
+      clearTimeout(timer);
+    }, 4000);
   };
 
   return (
@@ -261,22 +266,6 @@ function BondModal({
                 <InfoPlaceholder className="w-24 h-5" />
               )}
             </div>
-            <div className="flex justify-between mb-1">
-              <div>You will get</div>
-              {youWillGet ? (
-                <div>{youWillGet.locale(true).toString()} ARB</div>
-              ) : (
-                <InfoPlaceholder className="w-24 h-5" />
-              )}
-            </div>
-            <div className="flex justify-between mb-1">
-              <div>Max you can buy</div>
-              {maxYouCanBuy ? (
-                <div>{maxYouCanBuy.toString()} ARB</div>
-              ) : (
-                <InfoPlaceholder className="w-24 h-5" />
-              )}
-            </div>
           </div>
         ) : (
           <div className="flex flex-col w-full pb-3">
@@ -294,18 +283,19 @@ function BondModal({
             </div>
           </div>
         )}
-        {mode === "Bond" ? (
+        {mode === "Bond" && (
           <div className="flex flex-col w-full pt-3 border-t">
+            <div className="flex justify-between mb-1">
+              <div>You will get</div>
+              {youWillGet ? (
+                <div>{youWillGet.locale(true).toString()} ARB</div>
+              ) : (
+                <InfoPlaceholder className="w-24 h-5" />
+              )}
+            </div>
             <div className="flex justify-between">
               <div>Vesting term</div>
-              <div>5 days</div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col w-full pt-6 border-t">
-            <div className="flex justify-between mb-1">
-              <div>Time until fully vested</div>
-              <div>0 days</div>
+              <div>20 blocks</div>
             </div>
           </div>
         )}
@@ -325,17 +315,20 @@ export default function Bond({
   const openModal = () => setIsOpenModal(true);
   const closeModal = () => setIsOpenModal(false);
 
-  const { data: arbiterBondData } = useSWR("/arbiter/bond/v1beta1/bond_info/ugreen", fetcher);
-  const { data: arbiterStakeData } = useSWR("/arbiter/stake/v1beta1/total_reserve", fetcher);
+  const { data: arbiterBondData } = useSWR(
+    "/arbiter/bond/v1beta1/bond_info/ugreen",
+    fetcher
+  );
+  const { data: arbiterStakeData } = useSWR(
+    "/arbiter/stake/v1beta1/total_reserve",
+    fetcher
+  );
 
-  const treasuryBalance = arbiterStakeData ? toPrettyCoin(arbiterStakeData.totalReserve || "0", "ugreen")
-  .mul(
-    DecUtils.getPrecisionDec(
-      chainInfo.currencies.find(
-        (currency) => currency.coinMinimalDenom === "ugreen"
-      )!.coinDecimals
-    )
-  ).trim(true).hideDenom(true) : null;
+  const treasuryBalance = arbiterStakeData
+    ? toPrettyCoin(arbiterStakeData.totalReserve || "0", "uarb")
+        .trim(true)
+        .hideDenom(true)
+    : null;
 
   return (
     <div className="w-full h-full rounded-xl bg-secondary pt-8 pb-12 px-16 flex flex-col items-center">
@@ -351,7 +344,14 @@ export default function Bond({
       <div className="w-full mb-12 flex justify-around">
         <div className="flex flex-col items-center">
           <div className="text-lg">Treasury Balance</div>
-          {treasuryBalance ? <div className="text-xl">{treasuryBalance.toString()} GREEN (${treasuryBalance.mul(new Dec(10)).trim(true).toString()})</div> : <InfoPlaceholder className="w-24 h-5" />} 
+          {treasuryBalance ? (
+            <div className="text-xl">
+              {treasuryBalance.toString()} ARB ($
+              {treasuryBalance.mul(new Dec(10)).trim(true).toString()})
+            </div>
+          ) : (
+            <InfoPlaceholder className="w-24 h-5" />
+          )}
         </div>
         <div className="flex flex-col items-center">
           <div className="text-xl">ARB Price</div>
@@ -368,9 +368,9 @@ export default function Bond({
           {arbiterBondData ? (
             <div className="text-xl">
               {parseFloat(
-                parseFloat(`${parseFloat(arbiterBondData.executing_price) * 50}`).toFixed(
-                  2
-                )
+                parseFloat(
+                  `${parseFloat(arbiterBondData.executing_price) * 50}`
+                ).toFixed(2)
               )}
               % D/C
             </div>
