@@ -21,7 +21,7 @@ function BondModal({
   bech32Address,
 }: {
   closeModal: () => void;
-  keplr: Keplr;
+  keplr: Keplr | null;
   bech32Address: string;
 }) {
   const [mode, setMode] = useState<"Bond" | "Redeem">("Bond");
@@ -318,16 +318,24 @@ export default function Bond({
   keplr,
   bech32Address,
 }: {
-  keplr: Keplr;
+  keplr: Keplr | null;
   bech32Address: string;
 }) {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const openModal = () => setIsOpenModal(true);
   const closeModal = () => setIsOpenModal(false);
 
-  const { data } = useSWR("/arbiter/bond/v1beta1/bond_info/ugreen", fetcher);
+  const { data: arbiterBondData } = useSWR("/arbiter/bond/v1beta1/bond_info/ugreen", fetcher);
+  const { data: arbiterStakeData } = useSWR("/arbiter/stake/v1beta1/total_reserve", fetcher);
 
-  console.log(bech32Address);
+  const treasuryBalance = arbiterStakeData ? toPrettyCoin(arbiterStakeData.totalReserve || "0", "ugreen")
+  .mul(
+    DecUtils.getPrecisionDec(
+      chainInfo.currencies.find(
+        (currency) => currency.coinMinimalDenom === "ugreen"
+      )!.coinDecimals
+    )
+  ).trim(true).hideDenom(true) : null;
 
   return (
     <div className="w-full h-full rounded-xl bg-secondary pt-8 pb-12 px-16 flex flex-col items-center">
@@ -343,7 +351,7 @@ export default function Bond({
       <div className="w-full mb-12 flex justify-around">
         <div className="flex flex-col items-center">
           <div className="text-lg">Treasury Balance</div>
-          <div className="text-xl">30000 GREEN ($300,000)</div>
+          {treasuryBalance ? <div className="text-xl">{treasuryBalance.toString()} GREEN (${treasuryBalance.mul(new Dec(10)).trim(true).toString()})</div> : <InfoPlaceholder className="w-24 h-5" />} 
         </div>
         <div className="flex flex-col items-center">
           <div className="text-xl">ARB Price</div>
@@ -357,10 +365,10 @@ export default function Bond({
           onClick={openModal}
         >
           <div className="text-xl">GREEN (eco-credit)</div>
-          {data ? (
+          {arbiterBondData ? (
             <div className="text-xl">
               {parseFloat(
-                parseFloat(`${parseFloat(data.executing_price) * 50}`).toFixed(
+                parseFloat(`${parseFloat(arbiterBondData.executing_price) * 50}`).toFixed(
                   2
                 )
               )}
