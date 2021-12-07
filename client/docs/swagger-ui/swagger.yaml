@@ -422,6 +422,8 @@ paths:
                 format: int64
               rewardYield:
                 type: string
+              totalStaked:
+                type: string
         default:
           description: An unexpected error response
           schema:
@@ -22224,6 +22226,8 @@ definitions:
         type: string
         format: int64
       rewardYield:
+        type: string
+      totalStaked:
         type: string
   arbiter.stake.v1beta1.QueryStakedResponse:
     type: object
