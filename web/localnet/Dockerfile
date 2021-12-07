@@ -24,7 +24,7 @@ RUN ./arbiterd init localnet --chain-id arbiter-localnet-1
 
 RUN yq eval '.app_state.bond.params.policies[0].bond_denom = "ugreen"' ~/.arbiter/config/genesis.json \
     | yq eval '.app_state.bond.base_denom = "uarb"' - \
-    | yq eval '.app_state.bond.params.policies[0].vesting_height = "20"' - \
+    | yq eval '.app_state.bond.params.policies[0].vesting_height = "40"' - \
     | yq eval '.app_state.bond.params.policies[0].control_variable = "500"' - \
     | yq eval '.app_state.stake.stake_state.epoch.length = "40"' - \
     | yq eval '.app_state.staking.params.bond_denom = "uarb"' - \
@@ -45,10 +45,10 @@ RUN echo "health nest provide snow total tissue intact loyal cargo must credit w
 RUN echo "canyon stone next tenant trial ugly slim luggage ski govern outside comfort" | ./arbiterd keys add local2 --recover --keyring-backend test
 RUN echo "travel renew first fiction trick fly disease advance hunt famous absurd region" | ./arbiterd keys add local3 --recover --keyring-backend test
 
-RUN ./arbiterd add-genesis-account $(./arbiterd keys show val -a --keyring-backend test) 1000000uarb,100000000000ugreen
-RUN ./arbiterd add-genesis-account $(./arbiterd keys show local1 -a --keyring-backend test) 1000000uarb,100000000000ugreen
-RUN ./arbiterd add-genesis-account $(./arbiterd keys show local2 -a --keyring-backend test) 1000000uarb,100000000000ugreen
-RUN ./arbiterd add-genesis-account $(./arbiterd keys show local3 -a --keyring-backend test) 1000000uarb,100000000000ugreen
+RUN ./arbiterd add-genesis-account $(./arbiterd keys show val -a --keyring-backend test) 1000000uarb,1000000000ugreen
+RUN ./arbiterd add-genesis-account $(./arbiterd keys show local1 -a --keyring-backend test) 1000000uarb,1000000000ugreen
+RUN ./arbiterd add-genesis-account $(./arbiterd keys show local2 -a --keyring-backend test) 1000000uarb,1000000000ugreen
+RUN ./arbiterd add-genesis-account $(./arbiterd keys show local3 -a --keyring-backend test) 1000000uarb,1000000000ugreen
 
 RUN ./arbiterd gentx val 1000000uarb --chain-id arbiter-localnet-1 --keyring-backend test
 RUN ./arbiterd collect-gentxs
