@@ -10,9 +10,9 @@ export default function Header({
   signOut: () => void;
 }) {
   return (
-    <header className="fixed w-full h-full max-h-header bg-white bg-opacity-95">
-      <div className="max-w-default max-h-header w-full h-full m-auto flex justify-between items-center">
-        <div className="mr-8 text-xl">Arbiter DAO</div>
+    <header className="fixed z-30 w-full h-full max-h-header bg-white bg-opacity-70">
+      <div className="max-w-default max-h-header w-full h-full m-auto flex justify-between items-center bg-white bg-opacity-70">
+        <div className="mr-8 text-3xl font-bold">🛸 Arbiter DAO</div>
         <div>
           <span className="mr-3">
             {bech32Address && Bech32Address.shortenAddress(bech32Address, 18)}

@@ -68,10 +68,10 @@ const Home: NextPage = () => {
         signOut={signOut}
       />
       <main className="pt-24 pb-10 max-w-default w-full mx-auto">
+        <div className="flex justify-center"></div>
         <div className="mb-12">
           <Bond keplr={keplr} bech32Address={bech32Address} />
         </div>
-
         <Stake keplr={keplr} bech32Address={bech32Address} />
       </main>
     </>

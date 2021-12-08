@@ -341,7 +341,7 @@ export default function Bond({
           closeModal={closeModal}
         />
       )}
-      <div className="text-3xl mb-8">Bond (1, 1)</div>
+      <div className="text-3xl mb-8 font-semibold">Bond (1, 1) 🌳</div>
 
       <div className="w-full mb-12 flex justify-around">
         <div className="flex flex-col items-center">
@@ -352,7 +352,7 @@ export default function Bond({
               {treasuryBalance.mul(new Dec(10)).trim(true).toString()})
             </div>
           ) : (
-            <InfoPlaceholder className="w-24 h-5" />
+            <InfoPlaceholder className="w-24 h-5 mt-1" />
           )}
         </div>
         <div className="flex flex-col items-center">
@@ -363,7 +363,7 @@ export default function Bond({
 
       <div className="flex flex-col w-full">
         <div
-          className="flex justify-between items-center mb-4 py-4 px-6 border rounded-lg cursor-pointer"
+          className="flex justify-between items-center mb-4 py-4 px-6 border-4 border-border rounded-lg cursor-pointer"
           onClick={openModal}
         >
           <div className="text-xl">GREEN (eco-credit)</div>

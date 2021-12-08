@@ -13,7 +13,6 @@ import {
 } from "@cosmjs/launchpad";
 import { chainInfo } from "configs/chain";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
-import { setMaxListeners } from "process";
 
 export default function Stake({
   keplr,
@@ -180,7 +179,7 @@ export default function Stake({
 
   return (
     <div className="w-full h-full rounded-xl bg-primary pt-8 pb-12 px-16 flex flex-col items-center">
-      <div className="text-3xl mb-8">Stake (3, 3)</div>
+      <div className="text-3xl mb-8 font-semibold">Stake (3, 3) 🧊</div>
 
       <div className="w-full mb-12 flex justify-around">
         <div className="flex flex-col items-center">
