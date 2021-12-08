@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { fetcher } from "utils/api";
 import { toPrettyCoin } from "utils/coin";
@@ -177,6 +177,65 @@ export default function Stake({
         )
     : null;
 
+  // The elapsed time after the `blockUntilRebase` fetched.
+  const [elapsedRebaseTime, setElapsedRebaseTime] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElapsedRebaseTime((value) => value + 1000)
+    }, 1000)
+
+    return () => {
+        clearInterval(interval)
+    }
+  }, [])
+
+  useEffect(() => {
+    // Whenever the `blockUntilRebase` fetched(changed), clear the elapsed time.
+    setElapsedRebaseTime(0)
+  }, [arbiterStakeData?.blockUntilRebase])
+
+  // Assume that block interval is 5s.
+  const untilRebaseTime = arbiterStakeData?.blockUntilRebase ? (parseFloat(arbiterStakeData.blockUntilRebase) * 5000 - elapsedRebaseTime) : null
+
+  useEffect(() => {
+    // If the virtual time passed the rebase time, try to refetch the `blockUntilRebase`.
+    // It makes the rebase time in UI more accurate, and refresh the rebased `staked` amount automatically.
+    // TODO: This can make huge requests sequentially. Fix it.
+    if (untilRebaseTime && untilRebaseTime <= 0) {
+      mutate(`/arbiter/stake/v1beta1/stake_info/${bech32Address}`);
+    }
+  }, [untilRebaseTime])
+
+  const prettyUntilRebaseTime = useMemo(() => {
+    if (untilRebaseTime == null) {
+      return null
+    }
+
+    if (untilRebaseTime <= 0) {
+      return "0s"
+    }
+
+    const timeInSeconds = Math.floor(untilRebaseTime / 1000)
+
+          const hours = Math.floor(timeInSeconds / 60 / 60)
+          const minutes = Math.floor(timeInSeconds / 60) % 60
+          const seconds = Math.floor(timeInSeconds) % 60
+
+    let result = ""
+    if (hours) {
+      result += `${hours}h`
+    }
+    if (hours || minutes) {
+      result += ` ${minutes}m`
+    }
+    if (result.length > 0) {
+      result += " "
+    }
+    result += `${seconds}s`
+
+    return result
+  }, [untilRebaseTime])
+
   return (
     <div className="w-full h-full rounded-xl bg-primary pt-8 pb-12 px-16 flex flex-col items-center">
       <div className="text-3xl mb-8 font-semibold">Stake (3, 3) 🧊</div>
@@ -199,6 +258,16 @@ export default function Stake({
             </div>
           ) : (
             <InfoPlaceholder className="w-20 h-5 mt-1" />
+          )}
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="text-lg">Until Rebase</div>
+          {prettyUntilRebaseTime != null ? (
+              <div className="text-xl">
+                {prettyUntilRebaseTime}
+              </div>
+          ) : (
+              <InfoPlaceholder className="w-20 h-5 mt-1" />
           )}
         </div>
       </div>
