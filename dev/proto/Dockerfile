@@ -3,9 +3,9 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y git build-essential wget unzip nodejs npm
 
-RUN wget https://dl.google.com/go/go1.17.3.linux-amd64.tar.gz
-RUN tar -xvf go1.17.3.linux-amd64.tar.gz
-RUN mv go /usr/local
+COPY dev/proto/install-golang.sh install-golang.sh
+
+RUN sh install-golang.sh
 
 ENV GOROOT /usr/local/go
 ENV GOPATH /go
@@ -24,10 +24,9 @@ RUN go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
 
 RUN npm install -g swagger-combine
 
-RUN wget https://github.com/protocolbuffers/protobuf/releases/download/v3.19.1/protoc-3.19.1-linux-x86_64.zip
-RUN unzip protoc-3.19.1-linux-x86_64.zip -d /protoc
-RUN cp -r /protoc/bin /usr/local
-RUN cp -r /protoc/include /usr/local
+COPY dev/proto/install-protoc.sh install-protoc.sh
+
+RUN sh install-protoc.sh
 
 RUN mkdir /app
 
