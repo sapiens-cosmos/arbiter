@@ -15,10 +15,14 @@ Arbiter DAO is named after a spaceship from the game **starcraft**. An arbiter i
 
 To support easier testing in local environments, we have created a docker file in `web/localnet/Dockerfile`. 
 
+Docker installation is necessary to run local environment that has been pre-set for testing puposes. Dockerfile runs in amd64 cpu, also supporting arm64 (tested with M1 Mac).
+
 The dockerfile initializes node with params and genesis suitable for testing purposes (ex. change default epoch from 72,000 blocks to 40 blocks) then creates and provides three different accounts to test with. The project is also setted with a unique bech32 prefix, allowing to test the accounts with the mnemonics provided with Keplr.
 
 To start the node in your local environment along with integration of front end, run the following commands.
 ```
+cd web
+yarn install
 yarn localnet
 yarn dev
 ```
@@ -29,8 +33,12 @@ yarn dev
 Arbiter DAO has to main modules. The `bond` module handling the bonding moduels and the `stake` module which manages staking and works as a treasury for the protocol.
 
 ### Bond
-- the debt ratio, which is calculated using the equation `bonds_outstanding / base_supply' is controlled by params and governance.
-- Premium is calculated by the equation `premium = 1 + (debt_ratio * control_variable) while the execution price 
+The debt ratio is calculated using the equation `bonds_outstanding / base_supply`. 
+
+Premium is calculated by the equation  `premium = 1 + (debt_ratio * control_variable)` where control_varaible is controlled with params and governance.
+
+Executing price of ARB token is calculated from the following equation: `executing_price = risk_free_price * premium (premium >= 1) `.
+
 
 ### Stake
 Stake module param contains reward_ratio, which can be adjusted with governance in accordance to total supply and runway of ARB.
